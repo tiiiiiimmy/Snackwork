@@ -14,7 +14,10 @@ import type {
   ApiError,
 } from '../types/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Use relative URLs in development (with Vite proxy) or full URL in production
+const API_BASE_URL = import.meta.env.DEV
+  ? '' // Use relative URLs with Vite proxy in development
+  : (import.meta.env.VITE_API_URL || 'http://localhost:5011');
 
 class ApiService {
   private api: AxiosInstance;
@@ -42,7 +45,7 @@ class ApiService {
       (response) => response,
       async (error: AxiosError) => {
         const originalRequest = error.config;
-        
+
         if (error.response?.status === 401 && originalRequest && !originalRequest.url?.includes('/refresh')) {
           try {
             await this.refreshToken();
@@ -52,7 +55,7 @@ class ApiService {
             throw refreshError;
           }
         }
-        
+
         throw error;
       }
     );

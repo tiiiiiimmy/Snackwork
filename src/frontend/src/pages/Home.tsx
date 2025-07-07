@@ -13,7 +13,7 @@ export const Home: React.FC = () => {
   const [searchRadius, setSearchRadius] = useState(1000);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
-  
+
   const { snacks, loading: snacksLoading, error: snacksError, fetchSnacks } = useSnacks({
     location: selectedLocation,
     radius: searchRadius,
@@ -42,10 +42,11 @@ export const Home: React.FC = () => {
 
   if (locationLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Getting your location...</p>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-yellow-200 via-pink-200 to-purple-300">
+        <div className="text-center px-8 py-12 bg-white rounded-3xl border-4 border-purple-300 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+          <div className="text-8xl mb-6 animate-bounce">📍</div>
+          <div className="animate-spin rounded-full h-16 w-16 border-8 border-purple-200 border-t-purple-600 mx-auto mb-6"></div>
+          <p className="text-purple-600 font-bold text-xl">Getting your magical location...</p>
         </div>
       </div>
     );
@@ -53,17 +54,18 @@ export const Home: React.FC = () => {
 
   if (locationError && !location) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center max-w-md mx-auto px-4">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Location Required</h2>
-          <p className="text-gray-600 mb-6">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-200 via-orange-200 to-yellow-300">
+        <div className="text-center max-w-md mx-auto px-8 py-12 bg-white rounded-3xl border-4 border-red-300 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+          <div className="text-8xl mb-6">🎯</div>
+          <h2 className="text-3xl font-bold text-red-600 mb-6">Location Magic Needed!</h2>
+          <p className="text-red-500 font-medium mb-8 text-lg leading-relaxed">
             SnackSpot needs your location to show nearby snacks. Please enable location access or search for a specific area.
           </p>
           <button
             onClick={requestLocation}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
+            className="bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg transform hover:scale-110 transition-all duration-200 border-3 border-white"
           >
-            Enable Location
+            🚀 Enable Location Magic
           </button>
         </div>
       </div>
@@ -75,7 +77,7 @@ export const Home: React.FC = () => {
     : snacks;
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       {/* Filter bar */}
       <FilterBar
         onRadiusChange={handleRadiusChange}
@@ -88,7 +90,7 @@ export const Home: React.FC = () => {
       />
 
       {/* Main content */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative p-4">
         {viewMode === 'map' ? (
           <div className="h-full">
             <MapContainer

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { LoadingSpinner } from '../Common/LoadingSpinner';
 import type { Snack, Location } from '../../types/api';
+import { googleMapsLoader } from '../../utils/googleMaps';
 
 interface MapContainerProps {
   center?: Location;
@@ -19,30 +20,25 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
-  // Check if Google Maps is loaded
+  // Load Google Maps API using the global loader
   useEffect(() => {
-    if (window.google && window.google.maps) {
+    const loadMaps = async () => {
+      try {
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+        await googleMapsLoader.loadGoogleMaps(apiKey);
+        setIsGoogleMapsLoaded(true);
+      } catch (error) {
+        console.error('Failed to load Google Maps:', error);
+        setMapError(error instanceof Error ? error.message : 'Failed to load Google Maps');
+      }
+    };
+
+    if (googleMapsLoader.isGoogleMapsLoaded()) {
       setIsGoogleMapsLoaded(true);
     } else {
-      // Load Google Maps API
-      const script = document.createElement('script');
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-      
-      if (!apiKey || apiKey === 'your-google-maps-api-key-here') {
-        console.warn('Google Maps API key not configured. Map will not be available.');
-        return;
-      }
-
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => setIsGoogleMapsLoaded(true);
-      document.head.appendChild(script);
-
-      return () => {
-        document.head.removeChild(script);
-      };
+      loadMaps();
     }
   }, []);
 
@@ -51,7 +47,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     if (!isGoogleMapsLoaded || !mapRef.current || map) return;
 
     const defaultCenter = center || { lat: -36.8485, lng: 174.7633 }; // Auckland
-    
+
     const newMap = new google.maps.Map(mapRef.current, {
       zoom: 14,
       center: defaultCenter,
@@ -134,46 +130,47 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     setMarkers(newMarkers);
   }, [map, snacks]);
 
-  if (!isGoogleMapsLoaded) {
+  // Handle map error
+  if (mapError) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-100">
-        <div className="text-center">
-          <LoadingSpinner size="lg" className="mb-4" />
-          <p className="text-gray-600">Loading map...</p>
+      <div className="flex items-center justify-center h-full bg-gradient-to-br from-red-100 via-pink-100 to-purple-100">
+        <div className="text-center max-w-md px-6 py-8 bg-white rounded-3xl border-4 border-red-300 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+          <div className="text-6xl mb-4">😵</div>
+          <h3 className="text-2xl font-bold text-red-600 mb-4">Oops! Map Unavailable</h3>
+          <p className="text-red-500 font-medium">{mapError}</p>
         </div>
       </div>
     );
   }
 
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  if (!apiKey || apiKey === 'your-google-maps-api-key-here') {
+  if (!isGoogleMapsLoaded) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-100">
-        <div className="text-center max-w-md px-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Map Unavailable</h3>
-          <p className="text-gray-600">
-            Google Maps API key is not configured. Please set up the API key in your environment variables.
-          </p>
+      <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
+        <div className="text-center px-6 py-8 bg-white rounded-3xl border-4 border-blue-300 shadow-2xl">
+          <div className="text-6xl mb-4 animate-bounce">🗺️</div>
+          <LoadingSpinner size="lg" className="mb-4" />
+          <p className="text-blue-600 font-bold text-lg">Loading magical map...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full rounded-3xl overflow-hidden border-4 border-purple-300 shadow-2xl">
       <div ref={mapRef} className="w-full h-full" />
-      
+
       {loading && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-md px-4 py-2 flex items-center space-x-2">
+        <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full shadow-xl px-6 py-3 flex items-center space-x-3 border-3 border-white animate-pulse">
           <LoadingSpinner size="sm" />
-          <span className="text-sm text-gray-600">Loading snacks...</span>
+          <span className="text-white font-bold">🍿 Loading tasty snacks...</span>
         </div>
       )}
-      
+
       {snacks.length > 0 && (
-        <div className="absolute top-4 right-4 bg-white rounded-lg shadow-md px-3 py-2">
-          <span className="text-sm font-medium text-gray-900">
-            {snacks.length} snack{snacks.length !== 1 ? 's' : ''} found
+        <div className="absolute top-6 right-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full shadow-xl px-4 py-3 border-3 border-white transform hover:scale-110 transition-transform duration-200">
+          <span className="text-white font-bold flex items-center space-x-2">
+            <span className="text-xl">🎯</span>
+            <span>{snacks.length} snack{snacks.length !== 1 ? 's' : ''} found!</span>
           </span>
         </div>
       )}
