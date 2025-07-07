@@ -93,11 +93,41 @@ public class SnackSpotDbContext : DbContext
 
         // Seed initial categories
         modelBuilder.Entity<Category>().HasData(
-            new Category { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Sweet Snacks", Description = "Cookies, chocolates, and other sweet treats" },
-            new Category { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Savory Snacks", Description = "Chips, crackers, and salty snacks" },
-            new Category { Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), Name = "Healthy Snacks", Description = "Nuts, fruits, and nutritious options" },
-            new Category { Id = Guid.Parse("44444444-4444-4444-4444-444444444444"), Name = "Drinks", Description = "Beverages and liquid refreshments" },
-            new Category { Id = Guid.Parse("55555555-5555-5555-5555-555555555555"), Name = "Vegan Snacks", Description = "Plant-based snack options" }
+            new Category { 
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), 
+                Name = "Sweet Snacks", 
+                Description = "Cookies, chocolates, and other sweet treats",
+                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            },
+            new Category { 
+                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), 
+                Name = "Savory Snacks", 
+                Description = "Chips, crackers, and salty snacks",
+                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            },
+            new Category { 
+                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), 
+                Name = "Healthy Snacks", 
+                Description = "Nuts, fruits, and nutritious options",
+                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            },
+            new Category { 
+                Id = Guid.Parse("44444444-4444-4444-4444-444444444444"), 
+                Name = "Drinks", 
+                Description = "Beverages and liquid refreshments",
+                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            },
+            new Category { 
+                Id = Guid.Parse("55555555-5555-5555-5555-555555555555"), 
+                Name = "Vegan Snacks", 
+                Description = "Plant-based snack options",
+                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            }
         );
     }
 
