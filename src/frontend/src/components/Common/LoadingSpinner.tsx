@@ -13,7 +13,8 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
   return (
     <div
-      className={`loading-spinner ${sizeClass} ${className}`}
+      data-testid="loading-spinner"
+      className={`loading-spinner loading-spinner--${size} ${className}`}
       role="status"
       aria-label="Loading"
     >

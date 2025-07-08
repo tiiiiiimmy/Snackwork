@@ -3,6 +3,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { LoadingSpinner } from '../Common/LoadingSpinner';
 import type { Location } from '../../types/api';
 import { googleMapsLoader } from '../../utils/googleMaps';
+import { FocusTrap, announceToScreenReader } from '../../utils/accessibility';
 
 interface LocationPickerProps {
   initialLocation?: Location | null;
@@ -23,6 +24,31 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const [loading, setLoading] = useState(true);
   const [geocoder, setGeocoder] = useState<google.maps.Geocoder | null>(null);
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const focusTrapRef = useRef<FocusTrap | null>(null);
+
+  // Set up focus trap and escape key handling
+  useEffect(() => {
+    if (modalRef.current) {
+      focusTrapRef.current = new FocusTrap(modalRef.current);
+      focusTrapRef.current.activate();
+      
+      const handleEscape = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          onClose();
+        }
+      };
+      
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        focusTrapRef.current?.deactivate();
+        document.removeEventListener('keydown', handleEscape);
+        document.body.style.overflow = '';
+      };
+    }
+  }, [onClose]);
 
   // Load Google Maps API using the global loader
   useEffect(() => {
@@ -31,8 +57,10 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
         await googleMapsLoader.loadGoogleMaps(apiKey);
         setIsGoogleMapsLoaded(true);
+        announceToScreenReader('Map loaded successfully');
       } catch (error) {
         console.error('Failed to load Google Maps:', error);
+        announceToScreenReader('Failed to load map. Please try again.');
       }
     };
 

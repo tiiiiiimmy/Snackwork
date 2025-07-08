@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { User } from '../../types/api';
+import { FocusTrap } from '../../utils/accessibility';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -16,6 +17,31 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   user,
   onLogout,
 }) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const focusTrapRef = useRef<FocusTrap | null>(null);
+
+  useEffect(() => {
+    if (isOpen && menuRef.current) {
+      focusTrapRef.current = new FocusTrap(menuRef.current);
+      focusTrapRef.current.activate();
+      
+      const handleEscape = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          onClose();
+        }
+      };
+      
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        focusTrapRef.current?.deactivate();
+        document.removeEventListener('keydown', handleEscape);
+        document.body.style.overflow = '';
+      };
+    }
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleLogout = async () => {
@@ -24,23 +50,31 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   };
 
   return (
-    <div className="mobile-menu-overlay">
+    <div 
+      className="mobile-menu-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mobile-menu-title"
+      id="mobile-menu"
+    >
       <div
         className="mobile-menu-backdrop"
         onClick={onClose}
+        aria-hidden="true"
       />
-      <div className="mobile-menu-content">
+      <div className="mobile-menu-content" ref={menuRef}>
         <div className="mobile-menu-header">
-          <h2 className="mobile-menu-title">Menu</h2>
+          <h2 className="mobile-menu-title" id="mobile-menu-title">Menu</h2>
           <button
             onClick={onClose}
             className="mobile-menu-close"
+            aria-label="Close menu"
           >
-            <XMarkIcon />
+            <XMarkIcon aria-hidden="true" />
           </button>
         </div>
 
-        <nav className="mobile-menu-nav">
+        <nav className="mobile-menu-nav" aria-label="Mobile navigation">
           <Link
             to="/"
             className="mobile-menu-link"
@@ -61,6 +95,8 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               <button
                 onClick={handleLogout}
                 className="mobile-menu-button"
+                data-testid="logout-button"
+                aria-label="Log out of your account"
               >
                 Logout
               </button>
