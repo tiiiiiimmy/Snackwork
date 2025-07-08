@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPinIcon, PhotoIcon } from '@heroicons/react/24/outline';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useLocation } from '../hooks/useLocation';
 import { LoadingSpinner } from '../components/Common/LoadingSpinner';
 import { LocationPicker } from '../components/Forms/LocationPicker';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { StarIcon, MapPinIcon, ClockIcon, UserIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner } from '../components/Common/LoadingSpinner';
 import { ReviewCard } from '../components/Reviews/ReviewCard';
 import { AddReviewForm } from '../components/Reviews/AddReviewForm';

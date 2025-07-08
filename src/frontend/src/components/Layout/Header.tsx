@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPinIcon, UserIcon, Bars3Icon } from '@heroicons/react/24/outline';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { MobileMenu } from './MobileMenu';
 
 export const Header: React.FC = () => {

@@ -17,8 +17,8 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   onLocationChange,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -72,7 +72,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     }
 
     setMap(newMap);
-  }, [isGoogleMapsLoaded, center, onLocationChange, map]);
+  }, [isGoogleMapsLoaded]); // Removed problematic dependencies
 
   // Update map center when center prop changes
   useEffect(() => {
@@ -86,7 +86,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     if (!map) return;
 
     // Clear existing markers
-    markers.forEach(marker => marker.setMap(null));
+    markersRef.current.forEach(marker => marker.setMap(null));
 
     // Create new markers
     const newMarkers = snacks.map(snack => {
@@ -137,8 +137,15 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       return marker;
     });
 
-    setMarkers(newMarkers);
-  }, [map, snacks, markers]);
+    markersRef.current = newMarkers;
+  }, [map, snacks]);
+
+  // Cleanup markers on component unmount
+  useEffect(() => {
+    return () => {
+      markersRef.current.forEach(marker => marker.setMap(null));
+    };
+  }, []);
 
   // Handle map error
   if (mapError) {
