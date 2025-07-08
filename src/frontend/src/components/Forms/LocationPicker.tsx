@@ -23,7 +23,6 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const [loading, setLoading] = useState(true);
   const [geocoder, setGeocoder] = useState<google.maps.Geocoder | null>(null);
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
-  const [mapError, setMapError] = useState<string | null>(null);
 
   // Load Google Maps API using the global loader
   useEffect(() => {
@@ -34,7 +33,6 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         setIsGoogleMapsLoaded(true);
       } catch (error) {
         console.error('Failed to load Google Maps:', error);
-        setMapError(error instanceof Error ? error.message : 'Failed to load Google Maps');
       }
     };
 
@@ -166,97 +164,88 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
   if (!window.google || !window.google.maps) {
     return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-gradient-to-br from-red-100 to-pink-200 rounded-3xl p-8 max-w-md mx-4 border-4 border-red-300 shadow-2xl transform animate-pulse">
-          <div className="text-center">
-            <div className="text-6xl mb-4">🗺️❌</div>
-            <h3 className="text-2xl font-bold text-red-600 mb-4">Map Magic Unavailable</h3>
-            <p className="text-red-500 font-medium mb-6">
-              Google Maps API is not available. Please ensure you have a valid API key configured.
-            </p>
-            <button
-              onClick={onClose}
-              className="w-full bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white px-6 py-3 rounded-full font-bold shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Close
-            </button>
-          </div>
+      <div className="location-picker-modal">
+        <div className="modal-unavailable">
+          <h3 className="unavailable-title">
+            Map Unavailable
+          </h3>
+          <p className="unavailable-text">
+            Google Maps API is not available. Please ensure you have a valid API key configured.
+          </p>
+          <button
+            onClick={onClose}
+            className="cancel-button unavailable-button"
+          >
+            Close
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-white to-purple-50 rounded-3xl w-full max-w-4xl h-full max-h-[80vh] flex flex-col border-4 border-purple-300 shadow-2xl transform scale-95 animate-[fadeIn_0.3s_ease-out_forwards]">
+    <div className="location-picker-modal">
+      <div className="modal-content">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b-4 border-purple-200 bg-gradient-to-r from-yellow-300 to-orange-300 rounded-t-3xl">
-          <div className="flex items-center space-x-3">
-            <span className="text-3xl">📍</span>
-            <h3 className="text-2xl font-bold text-purple-800">Choose Snack Location</h3>
-          </div>
+        <div className="modal-header">
+          <h3 className="modal-title">Choose Snack Location</h3>
           <button
             onClick={onClose}
-            className="p-3 rounded-full bg-white text-purple-600 hover:bg-purple-100 shadow-lg transform hover:scale-110 transition-all duration-200 border-2 border-purple-300"
+            className="close-button"
           >
-            <XMarkIcon className="h-6 w-6" />
+            <XMarkIcon />
           </button>
         </div>
 
         {/* Map Container */}
-        <div className="flex-1 relative p-4">
+        <div className="modal-body">
           {loading && (
-            <div className="absolute inset-4 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl border-3 border-purple-300 z-10">
-              <div className="text-center">
-                <div className="text-6xl mb-4 animate-bounce">🗺️</div>
-                <LoadingSpinner size="lg" className="mb-4" />
-                <p className="text-purple-600 font-bold text-lg">Loading magical map...</p>
+            <div className="map-loading-overlay">
+              <div className="loading-content">
+                <LoadingSpinner size="lg" />
+                <p className="loading-text">
+                  Loading map...
+                </p>
               </div>
             </div>
           )}
-          <div ref={mapRef} className="w-full h-full rounded-2xl border-3 border-purple-300 shadow-lg overflow-hidden" />
+          <div ref={mapRef} className="map-container" />
+
+          {/* Location Info */}
+          {selectedLocation && (
+            <div className="location-info">
+              <div className="info-title">Selected Location</div>
+              <div className="info-address">
+                {address || 'Click or drag marker to select location'}
+              </div>
+              <div className="info-coordinates">
+                {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t-4 border-purple-200 bg-gradient-to-r from-green-100 to-blue-100 rounded-b-3xl">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex-1 space-y-2">
-              <p className="text-lg font-bold text-purple-800 flex items-center space-x-2">
-                <span>📍</span>
-                <span>Selected location:</span>
-              </p>
-              <p className="text-base font-medium text-purple-700 bg-white/70 rounded-full px-4 py-2 shadow-md">
-                {address || '🎯 Click or drag marker to select location'}
-              </p>
-              {selectedLocation && (
-                <p className="text-sm text-purple-600 bg-purple-100 rounded-full px-3 py-1 inline-block shadow-sm">
-                  🌐 {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
-                </p>
-              )}
-            </div>
-            <button
-              onClick={handleCurrentLocation}
-              className="ml-6 px-6 py-3 text-base font-bold text-white bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full hover:from-blue-500 hover:to-cyan-600 shadow-lg transform hover:scale-105 transition-all duration-200 border-2 border-white"
-            >
-              📱 Use Current Location
-            </button>
-          </div>
-
-          <div className="flex items-center justify-end space-x-4">
-            <button
-              onClick={onClose}
-              className="px-6 py-3 text-base font-bold text-purple-700 bg-white border-3 border-purple-300 rounded-full hover:bg-purple-50 shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirm}
-              disabled={!selectedLocation}
-              className="px-8 py-3 text-base font-bold text-white bg-gradient-to-r from-green-400 to-emerald-500 rounded-full hover:from-green-500 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform hover:scale-105 transition-all duration-200 border-2 border-white"
-            >
-              ✅ Confirm Location
-            </button>
-          </div>
+        <div className="modal-footer">
+          <button
+            onClick={handleCurrentLocation}
+            className="current-location-button"
+          >
+            Use Current Location
+          </button>
+          <button
+            onClick={onClose}
+            className="cancel-button"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={!selectedLocation}
+            className="confirm-button"
+          >
+            Confirm Location
+          </button>
         </div>
       </div>
     </div>

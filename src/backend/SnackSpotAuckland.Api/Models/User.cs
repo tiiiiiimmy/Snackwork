@@ -28,7 +28,7 @@ public class User
     [Range(0, int.MaxValue)]
     public int ExperiencePoints { get; set; } = 0;
 
-    [Column(TypeName = "geography (point)")]
+    [Column(TypeName = "geometry (point, 4326)")]
     public Point? Location { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

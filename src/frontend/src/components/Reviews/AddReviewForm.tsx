@@ -24,7 +24,7 @@ export const AddReviewForm: React.FC<AddReviewFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (rating === 0) {
       setError('Please select a rating');
       return;
@@ -51,7 +51,7 @@ export const AddReviewForm: React.FC<AddReviewFormProps> = ({
 
   const renderStarSelector = () => {
     return (
-      <div className="flex items-center space-x-1">
+      <div className="rating-stars">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
@@ -59,16 +59,20 @@ export const AddReviewForm: React.FC<AddReviewFormProps> = ({
             onClick={() => setRating(star)}
             onMouseEnter={() => setHoveredRating(star)}
             onMouseLeave={() => setHoveredRating(0)}
-            className="p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="star-button"
           >
             {star <= (hoveredRating || rating) ? (
-              <StarIconSolid className="h-8 w-8 text-yellow-400" />
+              <StarIconSolid className="filled" />
             ) : (
-              <StarIcon className="h-8 w-8 text-gray-300 hover:text-yellow-400 transition-colors" />
+              <StarIcon className="empty" />
             )}
           </button>
         ))}
-        <span className="ml-3 text-sm text-gray-600">
+        <span style={{
+          marginLeft: '0.75rem',
+          fontSize: '0.875rem',
+          color: '#6b7280'
+        }}>
           {rating > 0 ? `${rating} star${rating !== 1 ? 's' : ''}` : 'Select rating'}
         </span>
       </div>
@@ -76,27 +80,27 @@ export const AddReviewForm: React.FC<AddReviewFormProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Write a Review</h3>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="add-review-form">
+      <h3 className="form-title">Write a Review</h3>
+
+      <form onSubmit={handleSubmit}>
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+          <div className="auth-error">
             {error}
           </div>
         )}
 
         {/* Rating Selector */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="rating-input">
+          <label className="rating-label">
             Rating *
           </label>
           {renderStarSelector()}
         </div>
 
         {/* Comment */}
-        <div>
-          <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="comment-input">
+          <label htmlFor="comment" className="comment-label">
             Comment (optional)
           </label>
           <textarea
@@ -105,27 +109,27 @@ export const AddReviewForm: React.FC<AddReviewFormProps> = ({
             onChange={(e) => setComment(e.target.value)}
             rows={4}
             maxLength={500}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="comment-textarea"
             placeholder="Share your thoughts about this snack..."
           />
-          <div className="mt-1 text-xs text-gray-500 text-right">
+          <div className="character-count">
             {comment.length}/500 characters
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end space-x-3 pt-4">
+        <div className="form-actions">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="cancel-button"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading || rating === 0}
-            className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="submit-button"
           >
             {loading && <LoadingSpinner size="sm" />}
             <span>Submit Review</span>

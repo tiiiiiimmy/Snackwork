@@ -90,31 +90,41 @@ export const MapContainer: React.FC<MapContainerProps> = ({
 
     // Create new markers
     const newMarkers = snacks.map(snack => {
+      // Create a properly sized SVG marker
+      const svgMarker = {
+        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+          <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 9 12 20 12 20s12-11 12-20c0-6.627-5.373-12-12-12z" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2"/>
+            <circle cx="12" cy="12" r="6" fill="#FFFFFF"/>
+            <circle cx="12" cy="12" r="3" fill="#3B82F6"/>
+          </svg>
+        `),
+        scaledSize: new google.maps.Size(24, 32),
+        anchor: new google.maps.Point(12, 32),
+      };
+
       const marker = new google.maps.Marker({
         position: { lat: snack.latitude, lng: snack.longitude },
         map,
         title: snack.name,
-        icon: {
-          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="16" cy="16" r="12" fill="#3B82F6" stroke="white" stroke-width="2"/>
-              <circle cx="16" cy="16" r="4" fill="white"/>
-            </svg>
-          `),
-          scaledSize: new google.maps.Size(32, 32),
-          anchor: new google.maps.Point(16, 16),
-        },
+        icon: svgMarker,
       });
 
-      // Add info window
+      // Add info window with clean styling
       const infoWindow = new google.maps.InfoWindow({
         content: `
-          <div class="p-2 max-w-xs">
-            <h3 class="font-semibold text-gray-900 mb-1">${snack.name}</h3>
-            <p class="text-sm text-gray-600 mb-2">$${snack.price.toFixed(2)}</p>
-            <p class="text-xs text-gray-500">${snack.location}</p>
-            <div class="mt-2">
-              <a href="/snacks/${snack.id}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View Details</a>
+          <div style="padding: 12px; max-width: 280px; font-family: Inter, sans-serif;">
+            <h3 style="font-weight: 700; color: #111827; margin-bottom: 8px; font-size: 16px; line-height: 1.4; margin-top: 0;">${snack.name}</h3>
+            ${snack.description ? `<p style="font-size: 14px; color: #4b5563; margin-bottom: 8px; line-height: 1.5; margin-top: 0;">${snack.description}</p>` : ''}
+            <p style="font-size: 14px; color: #6b7280; margin-bottom: 12px; margin-top: 0;">${snack.location || 'Location'}</p>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="color: #f59e0b;">⭐</span>
+                <span style="font-size: 14px; font-weight: 500; color: #374151;">${snack.averageRating || 'No rating'}</span>
+              </div>
+              <a href="/snacks/${snack.id}" style="display: inline-flex; align-items: center; padding: 4px 12px; background: #3b82f6; color: white; text-decoration: none; font-size: 12px; font-weight: 500; border-radius: 9999px; transition: background-color 0.2s;">
+                View Details
+              </a>
             </div>
           </div>
         `,
@@ -133,11 +143,11 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   // Handle map error
   if (mapError) {
     return (
-      <div className="flex items-center justify-center h-full bg-gradient-to-br from-red-100 via-pink-100 to-purple-100">
-        <div className="text-center max-w-md px-6 py-8 bg-white rounded-3xl border-4 border-red-300 shadow-2xl transform hover:scale-105 transition-transform duration-300">
-          <div className="text-6xl mb-4">😵</div>
-          <h3 className="text-2xl font-bold text-red-600 mb-4">Oops! Map Unavailable</h3>
-          <p className="text-red-500 font-medium">{mapError}</p>
+      <div className="error-container">
+        <div className="error-content">
+          <div className="error-icon">😵</div>
+          <h3 className="error-title">Map Unavailable</h3>
+          <p className="error-message">{mapError}</p>
         </div>
       </div>
     );
@@ -145,32 +155,41 @@ export const MapContainer: React.FC<MapContainerProps> = ({
 
   if (!isGoogleMapsLoaded) {
     return (
-      <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
-        <div className="text-center px-6 py-8 bg-white rounded-3xl border-4 border-blue-300 shadow-2xl">
-          <div className="text-6xl mb-4 animate-bounce">🗺️</div>
-          <LoadingSpinner size="lg" className="mb-4" />
-          <p className="text-blue-600 font-bold text-lg">Loading magical map...</p>
+      <div className="loading-container">
+        <div className="loading-content">
+          <div className="loading-icon">🗺️</div>
+          <LoadingSpinner size="lg" />
+          <p className="loading-text">Loading map...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative h-full rounded-3xl overflow-hidden border-4 border-purple-300 shadow-2xl">
-      <div ref={mapRef} className="w-full h-full" />
+    <div className="map-container">
+      <div ref={mapRef} className="map-element" />
 
       {loading && (
-        <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full shadow-xl px-6 py-3 flex items-center space-x-3 border-3 border-white animate-pulse">
+        <div className="map-loading-overlay">
           <LoadingSpinner size="sm" />
-          <span className="text-white font-bold">🍿 Loading tasty snacks...</span>
+          <span className="loading-text">Loading snacks...</span>
         </div>
       )}
 
-      {snacks.length > 0 && (
-        <div className="absolute top-6 right-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full shadow-xl px-4 py-3 border-3 border-white transform hover:scale-110 transition-transform duration-200">
-          <span className="text-white font-bold flex items-center space-x-2">
-            <span className="text-xl">🎯</span>
-            <span>{snacks.length} snack{snacks.length !== 1 ? 's' : ''} found!</span>
+      {snacks.length > 0 && !loading && (
+        <div className="snack-count-badge">
+          <span className="count-text">
+            <span>🎯</span>
+            <span>{snacks.length} snack{snacks.length !== 1 ? 's' : ''}</span>
+          </span>
+        </div>
+      )}
+
+      {snacks.length === 0 && !loading && (
+        <div className="no-snacks-message">
+          <span className="message-text">
+            <span>🔍</span>
+            <span>No snacks found in this area</span>
           </span>
         </div>
       )}

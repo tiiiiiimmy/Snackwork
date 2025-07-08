@@ -1,5 +1,5 @@
 import React from 'react';
-import { StarIcon, UserIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { StarIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import type { Review } from '../../types/api';
 
@@ -10,12 +10,12 @@ interface ReviewCardProps {
 export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
   const renderStars = (rating: number) => {
     return (
-      <div className="flex items-center">
+      <div className="review-rating">
         {[...Array(5)].map((_, index) => (
           index < rating ? (
-            <StarIconSolid key={index} className="h-4 w-4 text-yellow-400" />
+            <StarIconSolid key={index} className="filled" />
           ) : (
-            <StarIcon key={index} className="h-4 w-4 text-gray-300" />
+            <StarIcon key={index} className="empty" />
           )
         ))}
       </div>
@@ -27,7 +27,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 1) {
       return 'Yesterday';
     } else if (diffDays < 7) {
@@ -44,40 +44,30 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
     }
   };
 
+  const getInitials = (username: string) => {
+    return username.charAt(0).toUpperCase();
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-start space-x-4">
-        {/* Avatar */}
-        <div className="flex-shrink-0">
-          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-            <UserIcon className="h-6 w-6 text-gray-400" />
+    <div className="review-card">
+      <div className="review-header">
+        <div className="review-author">
+          <div className="author-avatar">
+            {getInitials(review.user.username)}
+          </div>
+          <div className="author-info">
+            <div className="author-name">{review.user.username}</div>
+            <div className="review-date">{formatDate(review.createdAt)}</div>
           </div>
         </div>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-3">
-              <h4 className="text-sm font-medium text-gray-900">
-                {review.user.username}
-              </h4>
-              {renderStars(review.rating)}
-            </div>
-            <div className="flex items-center text-sm text-gray-500">
-              <ClockIcon className="h-4 w-4 mr-1" />
-              <span>{formatDate(review.createdAt)}</span>
-            </div>
-          </div>
-
-          {/* Comment */}
-          {review.comment && (
-            <p className="text-gray-700 text-sm leading-relaxed">
-              {review.comment}
-            </p>
-          )}
-        </div>
+        {renderStars(review.rating)}
       </div>
+
+      {review.comment && (
+        <div className="review-content">
+          {review.comment}
+        </div>
+      )}
     </div>
   );
 };

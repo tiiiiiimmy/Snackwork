@@ -33,7 +33,7 @@ public class Snack
     public Guid UserId { get; set; }
 
     [Required]
-    [Column(TypeName = "geography (point)")]
+    [Column(TypeName = "geometry (point, 4326)")]
     public Point Location { get; set; } = null!;
 
     [StringLength(200)]

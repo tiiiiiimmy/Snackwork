@@ -48,7 +48,7 @@ export const SnackDetail: React.FC = () => {
   const handleReviewAdded = async (newReview: Review) => {
     setReviews(prev => [newReview, ...prev]);
     setShowAddReview(false);
-    
+
     // Refresh snack data to get updated rating
     if (id) {
       try {
@@ -63,25 +63,24 @@ export const SnackDetail: React.FC = () => {
   const renderStars = (rating: number, size: 'sm' | 'lg' = 'sm') => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
-    const starSize = size === 'lg' ? 'h-6 w-6' : 'h-4 w-4';
-    
+
     return (
-      <div className="flex items-center">
+      <div className="stars">
         {[...Array(5)].map((_, index) => {
           if (index < fullStars) {
             return (
-              <StarIconSolid key={index} className={`${starSize} text-yellow-400`} />
+              <StarIconSolid key={index} className={`filled ${size === 'lg' ? 'large' : ''}`} />
             );
           } else if (index === fullStars && hasHalfStar) {
             return (
-              <div key={index} className="relative">
-                <StarIcon className={`${starSize} text-gray-300`} />
-                <StarIconSolid className={`absolute inset-0 ${starSize} text-yellow-400 clip-half`} />
+              <div key={index} className="star-half">
+                <StarIcon className={`empty ${size === 'lg' ? 'large' : ''}`} />
+                <StarIconSolid className={`filled ${size === 'lg' ? 'large' : ''}`} />
               </div>
             );
           } else {
             return (
-              <StarIcon key={index} className={`${starSize} text-gray-300`} />
+              <StarIcon key={index} className={`empty ${size === 'lg' ? 'large' : ''}`} />
             );
           }
         })}
@@ -99,24 +98,23 @@ export const SnackDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+      <div className="loading-container">
+        <div className="loading-content">
+          <LoadingSpinner size="lg" />
+        </div>
       </div>
     );
   }
 
   if (error || !snack) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <div className="text-center max-w-md">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Snack Not Found</h2>
-          <p className="text-gray-600 mb-6">
+      <div className="error-container">
+        <div className="error-content">
+          <h2 className="error-title">Snack Not Found</h2>
+          <p className="error-message">
             {error || 'The snack you\'re looking for doesn\'t exist or has been removed.'}
           </p>
-          <Link
-            to="/"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
-          >
+          <Link to="/" className="submit-button">
             Back to Discovery
           </Link>
         </div>
@@ -125,141 +123,137 @@ export const SnackDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="snack-detail-container">
+      <div className="snack-detail-content">
+        <div className="detail-grid">
+          {/* Main Info */}
+          <div className="snack-info-card">
             {/* Image */}
-            <div className="aspect-w-16 aspect-h-12">
-              {snack.imageUrl ? (
-                <img
-                  src={snack.imageUrl}
-                  alt={snack.name}
-                  className="w-full h-80 object-cover rounded-lg shadow-md"
-                />
-              ) : (
-                <div className="w-full h-80 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-400 text-lg">No image available</span>
-                </div>
-              )}
-            </div>
+            {snack.imageUrl ? (
+              <img
+                src={snack.imageUrl}
+                alt={snack.name}
+                className="snack-image"
+              />
+            ) : (
+              <div className="snack-image snack-image-placeholder">
+                <span>No image available</span>
+              </div>
+            )}
 
-            {/* Details */}
-            <div className="space-y-6">
-              <div>
-                <div className="flex items-start justify-between mb-4">
-                  <h1 className="text-3xl font-bold text-gray-900">{snack.name}</h1>
-                  <span className="text-2xl font-bold text-green-600">
-                    ${snack.price.toFixed(2)}
-                  </span>
-                </div>
+            {/* Header */}
+            <div className="snack-header">
+              <div className="snack-header-top">
+                <h1 className="snack-name">{snack.name}</h1>
+                <span className="price-display">
+                  ${snack.price.toFixed(2)}
+                </span>
+              </div>
 
-                {/* Rating */}
-                <div className="flex items-center space-x-3 mb-4">
+              {/* Rating */}
+              <div className="snack-meta">
+                <div className="rating-display">
                   {renderStars(snack.averageRating, 'lg')}
-                  <span className="text-xl font-medium text-gray-900">
+                  <span className="rating-score">
                     {snack.averageRating.toFixed(1)}
                   </span>
-                  <span className="text-gray-600">
+                  <span className="rating-text">
                     ({snack.reviewCount} review{snack.reviewCount !== 1 ? 's' : ''})
                   </span>
                 </div>
+              </div>
 
-                {/* Category */}
-                {snack.category && (
-                  <div className="mb-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                      {snack.category.name}
-                    </span>
-                  </div>
-                )}
+              {/* Category */}
+              {snack.category && (
+                <div className="category-section">
+                  <span className="status-badge status-info">
+                    {snack.category.name}
+                  </span>
+                </div>
+              )}
 
-                {/* Description */}
-                {snack.description && (
-                  <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                    {snack.description}
-                  </p>
-                )}
+              {/* Description */}
+              {snack.description && (
+                <p className="snack-description">
+                  {snack.description}
+                </p>
+              )}
 
-                {/* Location and Meta */}
-                <div className="space-y-3">
-                  <div className="flex items-center text-gray-600">
-                    <MapPinIcon className="h-5 w-5 mr-2" />
-                    <span>{snack.location}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <UserIcon className="h-5 w-5 mr-2" />
-                    <span>Added by {snack.user.username}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <ClockIcon className="h-5 w-5 mr-2" />
-                    <span>Added {formatDate(snack.createdAt)}</span>
-                  </div>
+              {/* Location and Meta */}
+              <div className="snack-meta-info">
+                <div className="snack-location">
+                  <MapPinIcon />
+                  <span>{snack.location}</span>
+                </div>
+                <div className="snack-location">
+                  <UserIcon />
+                  <span>Added by {snack.user.username}</span>
+                </div>
+                <div className="snack-location">
+                  <ClockIcon />
+                  <span>Added {formatDate(snack.createdAt)}</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Reviews Section */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Reviews ({reviews.length})
-            </h2>
-            {user && (
-              <button
-                onClick={() => setShowAddReview(!showAddReview)}
-                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-              >
-                <PlusIcon className="h-5 w-5" />
-                <span>Add Review</span>
-              </button>
-            )}
-          </div>
-
-          {/* Add Review Form */}
-          {showAddReview && user && snack && (
-            <div className="mb-8">
-              <AddReviewForm
-                snackId={snack.id}
-                onReviewAdded={handleReviewAdded}
-                onCancel={() => setShowAddReview(false)}
-              />
+          {/* Sidebar */}
+          <div className="snack-sidebar">
+            <div className="sidebar-card">
+              <h2 className="sidebar-title">
+                Reviews ({reviews.length})
+              </h2>
+              {user && (
+                <button
+                  onClick={() => setShowAddReview(!showAddReview)}
+                  className="submit-button add-review-button"
+                >
+                  <PlusIcon />
+                  <span>Add Review</span>
+                </button>
+              )}
             </div>
-          )}
 
-          {/* Reviews List */}
-          <div className="space-y-6">
-            {reviewsLoading ? (
-              <div className="flex justify-center py-8">
-                <LoadingSpinner size="lg" />
-              </div>
-            ) : reviews.length > 0 ? (
-              reviews.map((review) => (
-                <ReviewCard key={review.id} review={review} />
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No reviews yet
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Be the first to share your thoughts about this snack!
-                </p>
-                {user && (
-                  <button
-                    onClick={() => setShowAddReview(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
-                  >
-                    Write First Review
-                  </button>
-                )}
+            {/* Add Review Form */}
+            {showAddReview && user && snack && (
+              <div className="sidebar-card">
+                <AddReviewForm
+                  snackId={snack.id}
+                  onReviewAdded={handleReviewAdded}
+                  onCancel={() => setShowAddReview(false)}
+                />
               </div>
             )}
+
+            {/* Reviews List */}
+            <div className="reviews-list">
+              {reviewsLoading ? (
+                <div className="loading-container">
+                  <LoadingSpinner size="lg" />
+                </div>
+              ) : reviews.length > 0 ? (
+                reviews.map((review) => (
+                  <ReviewCard key={review.id} review={review} />
+                ))
+              ) : (
+                <div className="sidebar-card no-reviews-card">
+                  <h3 className="no-reviews-title">
+                    No reviews yet
+                  </h3>
+                  <p className="no-reviews-text">
+                    Be the first to share your thoughts about this snack!
+                  </p>
+                  {user && (
+                    <button
+                      onClick={() => setShowAddReview(true)}
+                      className="submit-button"
+                    >
+                      Write First Review
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

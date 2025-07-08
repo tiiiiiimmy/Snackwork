@@ -1,71 +1,66 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import type { User } from '../../types/api';
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  user: User | null;
+  onLogout: () => Promise<void> | void;
 }
 
-export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
-  const { user, logout } = useAuth();
+export const MobileMenu: React.FC<MobileMenuProps> = ({
+  isOpen,
+  onClose,
+  user,
+  onLogout,
+}) => {
+  if (!isOpen) return null;
 
   const handleLogout = async () => {
-    await logout();
+    await onLogout();
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <>
-      {/* Backdrop */}
+    <div className="mobile-menu-overlay">
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+        className="mobile-menu-backdrop"
         onClick={onClose}
       />
-      
-      {/* Menu */}
-      <div className="fixed inset-y-0 right-0 w-64 bg-white shadow-xl z-50 md:hidden">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
+      <div className="mobile-menu-content">
+        <div className="mobile-menu-header">
+          <h2 className="mobile-menu-title">Menu</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-md text-gray-400 hover:text-gray-600"
+            className="mobile-menu-close"
           >
-            <XMarkIcon className="h-6 w-6" />
+            <XMarkIcon />
           </button>
         </div>
-        
-        <nav className="p-4 space-y-4">
+
+        <nav className="mobile-menu-nav">
           <Link
             to="/"
+            className="mobile-menu-link"
             onClick={onClose}
-            className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
           >
-            Discover
+            Home
           </Link>
-          
+
           {user ? (
             <>
               <Link
                 to="/add-snack"
+                className="mobile-menu-link"
                 onClick={onClose}
-                className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
                 Add Snack
               </Link>
-              <Link
-                to="/profile"
-                onClick={onClose}
-                className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-              >
-                Profile ({user.username})
-              </Link>
               <button
                 onClick={handleLogout}
-                className="block w-full text-left px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                className="mobile-menu-button"
               >
                 Logout
               </button>
@@ -74,22 +69,22 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             <>
               <Link
                 to="/login"
+                className="mobile-menu-link"
                 onClick={onClose}
-                className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
                 Login
               </Link>
               <Link
                 to="/register"
+                className="mobile-menu-link mobile-menu-link-primary"
                 onClick={onClose}
-                className="block px-3 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md text-center"
               >
-                Sign Up
+                Register
               </Link>
             </>
           )}
         </nav>
       </div>
-    </>
+    </div>
   );
 };

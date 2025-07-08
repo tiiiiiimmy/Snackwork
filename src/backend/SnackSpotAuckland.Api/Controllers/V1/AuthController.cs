@@ -290,8 +290,8 @@ public class AuthController : ControllerBase
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = true, // Set to true in production with HTTPS
-            SameSite = SameSiteMode.Strict,
+            Secure = false, // Set to false for development (HTTP), true for production (HTTPS)
+            SameSite = SameSiteMode.Lax, // Changed from Strict to Lax for better compatibility
             Expires = DateTime.UtcNow.AddDays(30), // Match refresh token expiry
             Path = "/"
         };
