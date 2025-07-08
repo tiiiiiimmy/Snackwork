@@ -59,7 +59,7 @@ jobs:
         ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=snackspot_test;Username=testuser;Password=testpass"
     
     - name: Publish test results
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v2
       if: success() || failure()
       with:
         name: Backend Test Results
