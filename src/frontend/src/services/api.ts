@@ -182,9 +182,9 @@ class ApiService {
   handleApiError(error: AxiosError): ApiError {
     if (error.response) {
       return {
-        message: (error.response.data as any)?.message || 'An error occurred',
+        message: (error.response.data as { message?: string })?.message || 'An error occurred',
         status: error.response.status,
-        errors: (error.response.data as any)?.errors,
+        errors: (error.response.data as { errors?: Record<string, string[]> })?.errors,
       };
     } else if (error.request) {
       return {

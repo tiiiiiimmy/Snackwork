@@ -108,7 +108,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     return () => {
       newMarker.setMap(null);
     };
-  }, [initialLocation, isGoogleMapsLoaded]);
+  }, [initialLocation, isGoogleMapsLoaded, map]);
 
   const reverseGeocode = async (location: Location, geocoderInstance: google.maps.Geocoder) => {
     try {

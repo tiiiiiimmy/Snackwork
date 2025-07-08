@@ -1,26 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User, RegisterRequest, LoginRequest } from '../types/api';
+import { AuthContext } from './AuthContext';
 import apiService from '../services/api';
 
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  login: (credentials: LoginRequest) => Promise<void>;
-  register: (data: RegisterRequest) => Promise<void>;
-  logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -37,7 +20,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Try to refresh token and get current user
         const authResponse = await apiService.refreshToken();
         setUser(authResponse.user);
-      } catch (error) {
+      } catch {
         // No valid refresh token, user is not authenticated
         console.log('No valid authentication found');
       } finally {

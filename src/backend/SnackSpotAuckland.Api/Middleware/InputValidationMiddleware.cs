@@ -34,11 +34,11 @@ public class InputValidationMiddleware
 
             // Read and validate request body
             var requestBody = await ReadRequestBodyAsync(context.Request);
-            
+
             if (!string.IsNullOrEmpty(requestBody))
             {
                 var validationResult = ValidateRequestBody(requestBody, context.Request.Path);
-                
+
                 if (!validationResult.IsValid)
                 {
                     await WriteValidationErrorResponse(context, validationResult);
@@ -70,10 +70,10 @@ public class InputValidationMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during input validation");
-            await WriteValidationErrorResponse(context, new ValidationResult 
-            { 
-                IsValid = false, 
-                Errors = new Dictionary<string, object> { { "general", "Invalid request format" } } 
+            await WriteValidationErrorResponse(context, new ValidationResult
+            {
+                IsValid = false,
+                Errors = new Dictionary<string, object> { { "general", "Invalid request format" } }
             });
         }
     }

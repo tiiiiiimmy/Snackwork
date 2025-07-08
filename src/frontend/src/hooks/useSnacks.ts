@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Snack, Location } from '../types/api';
 import apiService from '../services/api';
 
@@ -13,7 +13,7 @@ export const useSnacks = ({ location, radius = 1000, autoFetch = true }: UseSnac
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSnacks = async (loc?: Location, r?: number) => {
+  const fetchSnacks = useCallback(async (loc?: Location, r?: number) => {
     if (!loc && !location) {
       setError('Location is required to fetch snacks');
       return;
@@ -38,7 +38,7 @@ export const useSnacks = ({ location, radius = 1000, autoFetch = true }: UseSnac
     } finally {
       setLoading(false);
     }
-  };
+  }, [location, radius]);
 
   const refetch = () => {
     if (location) {
@@ -50,7 +50,7 @@ export const useSnacks = ({ location, radius = 1000, autoFetch = true }: UseSnac
     if (autoFetch && location) {
       fetchSnacks(location, radius);
     }
-  }, [location?.lat, location?.lng, radius, autoFetch]);
+  }, [fetchSnacks, location, radius, autoFetch]);
 
   return {
     snacks,

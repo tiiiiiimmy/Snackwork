@@ -29,15 +29,15 @@ public class AuthService : IAuthService
         {
             // Check if user already exists
             var existingUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email.ToLower() == registerDto.Email.ToLower() || 
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == registerDto.Email.ToLower() ||
                                          u.Username.ToLower() == registerDto.Username.ToLower());
 
             if (existingUser != null)
             {
-                return new AuthResult 
-                { 
-                    Success = false, 
-                    Message = "User with this email or username already exists" 
+                return new AuthResult
+                {
+                    Success = false,
+                    Message = "User with this email or username already exists"
                 };
             }
 
@@ -70,10 +70,10 @@ public class AuthService : IAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error registering user {Email}", registerDto.Email);
-            return new AuthResult 
-            { 
-                Success = false, 
-                Message = "Registration failed" 
+            return new AuthResult
+            {
+                Success = false,
+                Message = "Registration failed"
             };
         }
     }
@@ -87,10 +87,10 @@ public class AuthService : IAuthService
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
             {
-                return new AuthResult 
-                { 
-                    Success = false, 
-                    Message = "Invalid email or password" 
+                return new AuthResult
+                {
+                    Success = false,
+                    Message = "Invalid email or password"
                 };
             }
 
@@ -107,10 +107,10 @@ public class AuthService : IAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error logging in user {Email}", loginDto.Email);
-            return new AuthResult 
-            { 
-                Success = false, 
-                Message = "Login failed" 
+            return new AuthResult
+            {
+                Success = false,
+                Message = "Login failed"
             };
         }
     }
@@ -125,10 +125,10 @@ public class AuthService : IAuthService
 
             if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiresAt <= DateTime.UtcNow)
             {
-                return new AuthResult 
-                { 
-                    Success = false, 
-                    Message = "Invalid or expired refresh token" 
+                return new AuthResult
+                {
+                    Success = false,
+                    Message = "Invalid or expired refresh token"
                 };
             }
 
@@ -154,10 +154,10 @@ public class AuthService : IAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error refreshing token");
-            return new AuthResult 
-            { 
-                Success = false, 
-                Message = "Token refresh failed" 
+            return new AuthResult
+            {
+                Success = false,
+                Message = "Token refresh failed"
             };
         }
     }

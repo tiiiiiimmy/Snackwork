@@ -45,8 +45,8 @@ public class AuthController : ControllerBase
             }
 
             var refreshToken = await _authService.GenerateRefreshTokenAsync(
-                result.User!, 
-                GetIpAddress(), 
+                result.User!,
+                GetIpAddress(),
                 GetUserAgent()
             );
 
@@ -102,8 +102,8 @@ public class AuthController : ControllerBase
             }
 
             var refreshToken = await _authService.GenerateRefreshTokenAsync(
-                result.User!, 
-                GetIpAddress(), 
+                result.User!,
+                GetIpAddress(),
                 GetUserAgent()
             );
 
@@ -265,7 +265,7 @@ public class AuthController : ControllerBase
         try
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
+
             if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
             {
                 return Unauthorized(new { message = "Invalid user" });
@@ -301,7 +301,7 @@ public class AuthController : ControllerBase
 
     private string GetIpAddress()
     {
-        return Request.Headers.ContainsKey("X-Forwarded-For") 
+        return Request.Headers.ContainsKey("X-Forwarded-For")
             ? Request.Headers["X-Forwarded-For"].ToString()
             : HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
     }

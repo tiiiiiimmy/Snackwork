@@ -18,7 +18,7 @@ public class RateLimitingMiddleware
         _logger = logger;
         _options = options;
         _clients = new ConcurrentDictionary<string, RateLimitInfo>();
-        
+
         // Cleanup expired entries every minute
         _cleanupTimer = new Timer(CleanupExpiredEntries, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
     }
@@ -27,10 +27,10 @@ public class RateLimitingMiddleware
     {
         var clientId = GetClientId(context);
         var endpoint = GetEndpoint(context);
-        
+
         // Get rate limit configuration for this endpoint
         var rateLimitConfig = GetRateLimitConfig(endpoint, context.Request.Method);
-        
+
         if (rateLimitConfig == null)
         {
             await _next(context);
@@ -39,7 +39,7 @@ public class RateLimitingMiddleware
 
         var now = DateTime.UtcNow;
         var key = $"{clientId}:{endpoint}:{context.Request.Method}";
-        
+
         var rateLimitInfo = _clients.GetOrAdd(key, _ => new RateLimitInfo
         {
             RequestCount = 0,
@@ -49,7 +49,7 @@ public class RateLimitingMiddleware
         bool isRateLimited = false;
         int requestCount = 0;
         DateTime windowStart = DateTime.UtcNow;
-        
+
         lock (rateLimitInfo)
         {
             // Reset window if expired
@@ -78,10 +78,10 @@ public class RateLimitingMiddleware
         if (isRateLimited)
         {
             _logger.LogWarning("Rate limit exceeded for client {ClientId} on endpoint {Endpoint}", clientId, endpoint);
-            
+
             var resetTimeExceeded = windowStart.Add(rateLimitConfig.Window);
             var retryAfter = (int)(resetTimeExceeded - now).TotalSeconds;
-            
+
             var errorResponse = new ErrorResponse
             {
                 StatusCode = (int)HttpStatusCode.TooManyRequests,
@@ -115,7 +115,7 @@ public class RateLimitingMiddleware
         // Add rate limit headers for successful requests
         var remaining = rateLimitConfig.MaxRequests - requestCount;
         var resetTimeNormal = windowStart.Add(rateLimitConfig.Window);
-        
+
         context.Response.Headers["X-RateLimit-Limit"] = rateLimitConfig.MaxRequests.ToString();
         context.Response.Headers["X-RateLimit-Remaining"] = remaining.ToString();
         context.Response.Headers["X-RateLimit-Reset"] = ((DateTimeOffset)resetTimeNormal).ToUnixTimeSeconds().ToString();
@@ -175,7 +175,7 @@ public class RateLimitingMiddleware
         };
 
         var key = $"{method}:{endpoint}";
-        
+
         // Try exact match first
         if (rateLimits.TryGetValue(key, out var config))
         {

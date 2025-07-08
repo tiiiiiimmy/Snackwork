@@ -28,7 +28,7 @@ public class RequestLoggingMiddleware
 
         var stopwatch = Stopwatch.StartNew();
         var requestId = Guid.NewGuid().ToString("N")[..8];
-        
+
         // Add request ID to context
         context.Items["RequestId"] = requestId;
 
@@ -130,7 +130,7 @@ public class RequestLoggingMiddleware
             responseBody.Seek(0, SeekOrigin.Begin);
             using var reader = new StreamReader(responseBody, Encoding.UTF8, leaveOpen: true);
             var responseContent = await reader.ReadToEndAsync();
-            
+
             if (!string.IsNullOrEmpty(responseContent))
             {
                 var sanitizedResponse = SanitizeResponseBody(responseContent);
@@ -164,10 +164,10 @@ public class RequestLoggingMiddleware
     {
         request.EnableBuffering();
         request.Body.Position = 0;
-        
+
         using var reader = new StreamReader(request.Body, Encoding.UTF8, leaveOpen: true);
         var body = await reader.ReadToEndAsync();
-        
+
         request.Body.Position = 0;
         return body;
     }

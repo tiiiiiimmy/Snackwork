@@ -43,31 +43,31 @@ public class ErrorHandlingMiddleware
                 errorResponse.Message = "Validation failed";
                 errorResponse.Details = validationEx.Errors;
                 break;
-            
+
             case UnauthorizedAccessException:
                 response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 errorResponse.Message = "Unauthorized access";
                 break;
-            
+
             case KeyNotFoundException:
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 errorResponse.Message = "Resource not found";
                 break;
-            
+
             case InvalidOperationException invalidOpEx:
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 errorResponse.Message = invalidOpEx.Message;
                 break;
-            
+
             case ArgumentException argEx:
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 errorResponse.Message = argEx.Message;
                 break;
-            
+
             default:
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 errorResponse.Message = "An unexpected error occurred";
-                
+
                 if (_environment.IsDevelopment())
                 {
                     errorResponse.Details = new Dictionary<string, object>

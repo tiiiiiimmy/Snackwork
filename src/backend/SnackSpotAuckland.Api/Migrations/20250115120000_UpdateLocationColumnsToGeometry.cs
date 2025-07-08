@@ -12,7 +12,7 @@ namespace SnackSpotAuckland.Api.Migrations
         {
             // Update Snacks table Location column from geography to geometry
             migrationBuilder.Sql("ALTER TABLE \"Snacks\" ALTER COLUMN \"Location\" TYPE geometry(Point, 4326) USING ST_Transform(\"Location\"::geometry, 4326);");
-            
+
             // Update Users table Location column from geography to geometry
             migrationBuilder.Sql("ALTER TABLE \"Users\" ALTER COLUMN \"Location\" TYPE geometry(Point, 4326) USING ST_Transform(\"Location\"::geometry, 4326);");
         }
@@ -22,9 +22,9 @@ namespace SnackSpotAuckland.Api.Migrations
         {
             // Revert Snacks table Location column from geometry to geography
             migrationBuilder.Sql("ALTER TABLE \"Snacks\" ALTER COLUMN \"Location\" TYPE geography(Point) USING \"Location\"::geography;");
-            
+
             // Revert Users table Location column from geometry to geography
             migrationBuilder.Sql("ALTER TABLE \"Users\" ALTER COLUMN \"Location\" TYPE geography(Point) USING \"Location\"::geography;");
         }
     }
-} 
+}

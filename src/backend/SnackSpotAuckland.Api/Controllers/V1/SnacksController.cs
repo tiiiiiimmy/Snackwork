@@ -52,7 +52,7 @@ public class SnacksController : ControllerBase
             }
 
             var searchPoint = _geometryFactory.CreatePoint(new Coordinate(lng, lat));
-            
+
             var snacks = await _context.Snacks
                 .Include(s => s.Category)
                 .Include(s => s.User)

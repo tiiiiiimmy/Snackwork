@@ -138,7 +138,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     });
 
     setMarkers(newMarkers);
-  }, [map, snacks]);
+  }, [map, snacks, markers]);
 
   // Handle map error
   if (mapError) {
