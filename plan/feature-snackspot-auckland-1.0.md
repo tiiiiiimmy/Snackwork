@@ -90,7 +90,7 @@ This implementation plan provides a step-by-step, machine-readable roadmap for b
 | Task     | Description                                                                      | Completed | Date |
 | -------- | -------------------------------------------------------------------------------- | --------- | ---- |
 | TASK-029 | Scaffold React + TypeScript project in /src/frontend.                            | ✅        | 2025-07-07 |
-| TASK-030 | Set up Tailwind CSS (or chosen styling library) and configure breakpoints.       | ✅        | 2025-07-07 |
+| TASK-030 | Set up  SCSS (or chosen styling library) and configure breakpoints.       | ✅        | 2025-07-07 |
 | TASK-031 | Implement routing with React Router.                                             | ✅        | 2025-07-07 |
 | TASK-032 | Build core UI components: map view, snack cards, forms, navigation.              | ✅        | 2025-07-07 |
 | TASK-033 | Ensure all UI meets WCAG 2.1 AA and Lighthouse ≥ 90.                             |           |      |
@@ -122,7 +122,7 @@ This implementation plan provides a step-by-step, machine-readable roadmap for b
 
 ## 4. Dependencies
 
-- **DEP-001**: React, TypeScript, Tailwind CSS (or chosen styling library)
+- **DEP-001**: React, TypeScript,  SCSS (or chosen styling library)
 - **DEP-002**: .NET 8+, Entity Framework Core, SQL database
 - **DEP-003**: GitHub Actions, pre-commit hooks
 - **DEP-004**: Google Maps API, Cloudinary, AWS S3, Firebase Cloud Messaging

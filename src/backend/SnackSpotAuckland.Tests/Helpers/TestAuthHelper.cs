@@ -1,0 +1,103 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using SnackSpotAuckland.Api.Models;
+
+namespace SnackSpotAuckland.Tests.Helpers;
+
+public static class TestAuthHelper
+{
+    private const string TestJwtKey = "test-super-secret-key-at-least-256-bits-long-for-security-testing-purposes";
+    private const string TestIssuer = "SnackSpotAuckland.Tests";
+    private const string TestAudience = "SnackSpotAuckland.Tests";
+
+    public static string GenerateJwtToken(User user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(TestJwtKey);
+        
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim("sub", user.Id.ToString()),
+                new Claim("username", user.Username),
+                new Claim("email", user.Email),
+                new Claim("level", user.Level.ToString())
+            }),
+            Expires = DateTime.UtcNow.AddHours(1),
+            Issuer = TestIssuer,
+            Audience = TestAudience,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
+    public static string GenerateExpiredJwtToken(User user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(TestJwtKey);
+        
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim("sub", user.Id.ToString()),
+                new Claim("username", user.Username),
+                new Claim("email", user.Email)
+            }),
+            Expires = DateTime.UtcNow.AddHours(-1), // Expired 1 hour ago
+            Issuer = TestIssuer,
+            Audience = TestAudience,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
+    public static string GenerateInvalidJwtToken()
+    {
+        return "invalid.jwt.token";
+    }
+
+    public static async Task<string> LoginAndGetTokenAsync(HttpClient client, string username, string password)
+    {
+        var loginRequest = new
+        {
+            Username = username,
+            Password = password
+        };
+
+        var response = await client.PostAsJsonAsync("/api/v1/auth/login", loginRequest);
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException($"Login failed with status: {response.StatusCode}");
+        }
+
+        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+        return loginResponse?.AccessToken ?? throw new InvalidOperationException("No access token received");
+    }
+
+    public static void AddAuthorizationHeader(HttpClient client, string token)
+    {
+        client.DefaultRequestHeaders.Authorization = 
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+    }
+
+    public static void RemoveAuthorizationHeader(HttpClient client)
+    {
+        client.DefaultRequestHeaders.Authorization = null;
+    }
+
+    private class LoginResponse
+    {
+        public string AccessToken { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
+        public DateTime ExpiresAt { get; set; }
+    }
+}

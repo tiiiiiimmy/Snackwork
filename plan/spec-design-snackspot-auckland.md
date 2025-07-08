@@ -30,7 +30,7 @@ The purpose of this specification is to provide a clear, unambiguous reference f
 
 ## 3. Requirements, Constraints & Guidelines
 
-- **REQ-001**: The frontend shall use React with TypeScript (JavaScript allowed with justification) and a styling library (e.g., MUI, Mantine, Tailwind) or custom styling, focusing on a visually appealing, responsive UI.
+- **REQ-001**: The frontend shall use React with TypeScript (JavaScript allowed with justification) and a styling library (e.g., MUI, Mantine) or custom styling, focusing on a visually appealing, responsive UI.
 - **REQ-002**: The frontend must implement navigation using React Router or a similar routing library.
 - **REQ-003**: The frontend must achieve Lighthouse scores ≥ 90 for performance and accessibility, and meet WCAG 2.1 AA.
 - **REQ-004**: The frontend must support mobile, tablet, and desktop breakpoints unless explicitly approved. If not responsive, the README must justify why.
@@ -181,7 +181,7 @@ data_source ENUM('user','scraped','seeded')
 
 ### Technology Platform Dependencies
 
-- **PLT-001**: Node.js 18+ (for frontend tooling), React 18+, Tailwind CSS, Vite
+- **PLT-001**: Node.js 18+ (for frontend tooling), React 18+,  CSS, Vite
 - **PLT-002**: .NET 8+, Entity Framework Core, SQL/NoSQL database
 
 ### Compliance Dependencies
@@ -227,6 +227,5 @@ data_source ENUM('user','scraped','seeded')
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [.NET 8 Documentation](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-8)
 - [Entity Framework Core Docs](https://learn.microsoft.com/en-us/ef/core/)
-- [Tailwind CSS Docs](https://tailwindcss.com/docs/installation)
 - [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
 - [GitHub Actions Docs](https://docs.github.com/en/actions)
