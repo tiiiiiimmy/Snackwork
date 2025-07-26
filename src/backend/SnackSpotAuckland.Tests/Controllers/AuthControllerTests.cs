@@ -137,7 +137,7 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactoryFixture>
 
         var loginRequest = new
         {
-            Username = "loginuser",
+            Email = "loginuser@example.com",
             Password = "TestPassword123!"
         };
 
@@ -150,8 +150,6 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactoryFixture>
         var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
         loginResponse.Should().NotBeNull();
         loginResponse!.AccessToken.Should().NotBeNullOrEmpty();
-        loginResponse.RefreshToken.Should().NotBeNullOrEmpty();
-        loginResponse.ExpiresAt.Should().BeAfter(DateTime.UtcNow);
 
         // Verify refresh token was stored
         using var verifyScope = _factory.Services.CreateScope();
@@ -174,7 +172,7 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactoryFixture>
 
         var loginRequest = new
         {
-            Username = "loginuser2",
+            Email = "loginuser2@example.com",
             Password = "WrongPassword123!"
         };
 
@@ -191,7 +189,7 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactoryFixture>
         // Arrange
         var loginRequest = new
         {
-            Username = "nonexistentuser",
+            Email = "nonexistentuser@example.com",
             Password = "TestPassword123!"
         };
 
@@ -203,14 +201,14 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactoryFixture>
     }
 
     [Theory]
-    [InlineData("", "TestPassword123!")] // Empty username
-    [InlineData("testuser", "")] // Empty password
-    public async Task Login_WithMissingData_ShouldReturnBadRequest(string username, string password)
+    [InlineData("", "TestPassword123!")] // Empty email
+    [InlineData("testuser@example.com", "")] // Empty password
+    public async Task Login_WithMissingData_ShouldReturnBadRequest(string email, string password)
     {
         // Arrange
         var loginRequest = new
         {
-            Username = username,
+            Email = email,
             Password = password
         };
 
@@ -324,8 +322,8 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactoryFixture>
     private class LoginResponse
     {
         public string AccessToken { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
-        public DateTime ExpiresAt { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public User User { get; set; } = null!;
     }
 
     private class UserProfile

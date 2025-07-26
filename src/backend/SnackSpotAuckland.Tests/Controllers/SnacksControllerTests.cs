@@ -410,12 +410,15 @@ public class SnacksControllerTests : IClassFixture<WebApplicationFactoryFixture>
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty; // API returns category name as string
+        public string? ImageUrl { get; set; }
         public string ShopName { get; set; } = string.Empty;
         public string ShopAddress { get; set; } = string.Empty;
         public decimal AverageRating { get; set; }
         public int TotalRatings { get; set; }
         public LocationResponse Location { get; set; } = new();
-        public CategoryResponse Category { get; set; } = new();
+        public DateTime CreatedAt { get; set; }
+        public UserResponse User { get; set; } = new();
     }
 
     private class LocationResponse
@@ -424,9 +427,9 @@ public class SnacksControllerTests : IClassFixture<WebApplicationFactoryFixture>
         public double Lng { get; set; }
     }
 
-    private class CategoryResponse
+    private class UserResponse
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
     }
 }

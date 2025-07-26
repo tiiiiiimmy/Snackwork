@@ -169,7 +169,6 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
-app.UseMiddleware<InputValidationMiddleware>();
 app.UseMiddleware<RateLimitingMiddleware>();
 
 app.UseHttpsRedirection();
@@ -177,6 +176,9 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Input validation after auth so that auth errors (401/403) are returned before validation errors (400)
+app.UseMiddleware<InputValidationMiddleware>();
 
 app.MapControllers();
 

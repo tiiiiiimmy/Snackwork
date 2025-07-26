@@ -14,11 +14,11 @@ public static class TestDataFactory
         {
             Id = Guid.NewGuid(),
             Username = username ?? Faker.Internet.UserName(),
-            Email = email ?? Faker.Internet.Email(),
+            Email = (email ?? Faker.Internet.Email()).ToLower(), // Store email in lowercase like AuthService does
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("TestPassword123!"),
             Level = Faker.Random.Int(1, 5),
             ExperiencePoints = Faker.Random.Int(0, 1000),
-            Location = CreateAucklandPoint(),
+            Location = null, // Avoid spatial data issues in in-memory database
             CreatedAt = DateTime.UtcNow.AddDays(-Faker.Random.Int(1, 365)),
             UpdatedAt = DateTime.UtcNow
         };
@@ -38,6 +38,9 @@ public static class TestDataFactory
 
     public static Snack CreateSnack(Guid? userId = null, Guid? categoryId = null, string? name = null)
     {
+        var geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+        var testPoint = geometryFactory.CreatePoint(new Coordinate(174.7633, -36.8485)); // Auckland coordinates
+        
         return new Snack
         {
             Id = Guid.NewGuid(),
@@ -45,7 +48,7 @@ public static class TestDataFactory
             Description = Faker.Lorem.Paragraph(),
             UserId = userId ?? Guid.NewGuid(),
             CategoryId = categoryId ?? Guid.NewGuid(),
-            Location = CreateAucklandPoint(),
+            Location = testPoint, // Use a simple fixed point for tests
             ShopName = Faker.Company.CompanyName(),
             ShopAddress = Faker.Address.FullAddress(),
             ImageUrl = Faker.Internet.Avatar(),
@@ -99,10 +102,10 @@ public static class TestDataFactory
         
         public static class LoginRequest
         {
-            public static object Valid => new { Username = "testuser", Password = "TestPassword123!" };
-            public static object InvalidUsername => new { Username = "", Password = "TestPassword123!" };
-            public static object InvalidPassword => new { Username = "testuser", Password = "123" };
-            public static object WrongCredentials => new { Username = "testuser", Password = "WrongPassword123!" };
+            public static object Valid => new { Email = "testuser@example.com", Password = "TestPassword123!" };
+            public static object InvalidEmail => new { Email = "", Password = "TestPassword123!" };
+            public static object InvalidPassword => new { Email = "testuser@example.com", Password = "123" };
+            public static object WrongCredentials => new { Email = "testuser@example.com", Password = "WrongPassword123!" };
         }
 
         public static class RegisterRequest

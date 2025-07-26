@@ -38,7 +38,7 @@ public class RateLimitingMiddlewareTests : IClassFixture<WebApplicationFactoryFi
     {
         // Arrange
         using var client = _factory.CreateClient();
-        var loginRequest = new { Username = "testuser", Password = "wrongpassword" };
+        var loginRequest = new { Email = "testuser@example.com", Password = "wrongpassword" };
 
         // Act - Exceed login rate limit (5 requests per minute)
         HttpResponseMessage? lastResponse = null;

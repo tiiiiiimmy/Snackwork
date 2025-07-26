@@ -2,82 +2,108 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SnackSpotAuckland.Api.Data;
+using SnackSpotAuckland.Api.Services;
 
 namespace SnackSpotAuckland.Tests.TestFixtures;
 
 public class WebApplicationFactoryFixture : WebApplicationFactory<Program>
 {
+    private readonly string _databaseName = $"TestDb_{Guid.NewGuid()}";
+    
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Testing");
+        
+        // Configure test-specific settings
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Jwt:Key"] = "test-super-secret-key-at-least-256-bits-long-for-security-testing-purposes",
+                ["Jwt:Issuer"] = "SnackSpotAuckland.Tests",
+                ["Jwt:Audience"] = "SnackSpotAuckland.Tests",
+                ["Jwt:AccessTokenExpiryMinutes"] = "60",
+                ["Jwt:RefreshTokenExpiryDays"] = "30"
+            });
+        });
+        
         builder.ConfigureServices(services =>
         {
-            // Remove the app's DbContext registration and related services
-            var descriptors = services.Where(d => 
+            // Remove ALL Entity Framework related services
+            var efDescriptors = services.Where(d =>
+                d.ServiceType.FullName?.Contains("EntityFramework") == true ||
+                d.ServiceType.FullName?.Contains("Npgsql") == true ||
+                d.ImplementationType?.FullName?.Contains("EntityFramework") == true ||
+                d.ImplementationType?.FullName?.Contains("Npgsql") == true ||
+                d.ServiceType == typeof(DbContextOptions) ||
                 d.ServiceType == typeof(DbContextOptions<SnackSpotDbContext>) ||
-                d.ServiceType == typeof(SnackSpotDbContext) ||
-                d.ServiceType.IsGenericType && d.ServiceType.GetGenericTypeDefinition() == typeof(DbContextOptions<>)
-            ).ToArray();
-            
-            foreach (var descriptor in descriptors)
+                d.ServiceType == typeof(SnackSpotDbContext)
+            ).ToList();
+
+            foreach (var descriptor in efDescriptors)
             {
                 services.Remove(descriptor);
             }
 
-            // Add DbContext using in-memory database for testing
+            // Add fresh in-memory database
             services.AddDbContext<SnackSpotDbContext>(options =>
             {
-                options.UseInMemoryDatabase("TestDatabase");
-                // Note: InMemory database doesn't support spatial data, so UseNetTopologySuite() is not needed
+                options.UseInMemoryDatabase(_databaseName);
             });
 
-            // Disable logging during tests
-            services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
-
-            // Build the service provider
-            var serviceProvider = services.BuildServiceProvider();
-
-            // Create a scope to obtain a reference to the database context
-            using var scope = serviceProvider.CreateScope();
-            var scopedServices = scope.ServiceProvider;
-            var context = scopedServices.GetRequiredService<SnackSpotDbContext>();
-
-            // Ensure the database is created
-            context.Database.EnsureCreated();
-
-            // Seed test data if needed
-            SeedTestData(context);
+            // Ensure other required services are registered
+            services.AddScoped<IAuthService, AuthService>();
         });
+    }
 
-        builder.UseEnvironment("Testing");
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        var host = base.CreateHost(builder);
+        
+        // Seed test data
+        using var scope = host.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        context.Database.EnsureCreated();
+        SeedTestData(context);
+        
+        return host;
     }
 
     private void SeedTestData(SnackSpotDbContext context)
     {
-        // Add any common test data here
         if (!context.Categories.Any())
         {
             var categories = new[]
             {
-                new SnackSpotAuckland.Api.Models.Category { Id = Guid.NewGuid(), Name = "Sweet", Description = "Sweet snacks and treats" },
-                new SnackSpotAuckland.Api.Models.Category { Id = Guid.NewGuid(), Name = "Savory", Description = "Savory snacks and meals" },
-                new SnackSpotAuckland.Api.Models.Category { Id = Guid.NewGuid(), Name = "Healthy", Description = "Healthy and nutritious options" }
+                new SnackSpotAuckland.Api.Models.Category 
+                { 
+                    Id = Guid.NewGuid(), 
+                    Name = "Sweet", 
+                    Description = "Sweet snacks and treats",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new SnackSpotAuckland.Api.Models.Category 
+                { 
+                    Id = Guid.NewGuid(), 
+                    Name = "Savory", 
+                    Description = "Savory snacks and meals",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new SnackSpotAuckland.Api.Models.Category 
+                { 
+                    Id = Guid.NewGuid(), 
+                    Name = "Healthy", 
+                    Description = "Healthy and nutritious options",
+                    CreatedAt = DateTime.UtcNow
+                }
             };
 
             context.Categories.AddRange(categories);
             context.SaveChanges();
         }
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            using var scope = Services.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-            context.Database.EnsureDeleted();
-        }
-        base.Dispose(disposing);
     }
 }

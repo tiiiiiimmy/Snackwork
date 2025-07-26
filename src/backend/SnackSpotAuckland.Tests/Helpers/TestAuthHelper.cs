@@ -64,11 +64,11 @@ public static class TestAuthHelper
         return "invalid.jwt.token";
     }
 
-    public static async Task<string> LoginAndGetTokenAsync(HttpClient client, string username, string password)
+    public static async Task<string> LoginAndGetTokenAsync(HttpClient client, string email, string password)
     {
         var loginRequest = new
         {
-            Username = username,
+            Email = email,
             Password = password
         };
 

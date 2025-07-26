@@ -24,7 +24,7 @@ public class InputValidationMiddlewareTests : IClassFixture<WebApplicationFactor
     {
         // Arrange
         using var client = _factory.CreateClient();
-        var maliciousRequest = new { Username = maliciousContent, Password = "test123" };
+        var maliciousRequest = new { Email = maliciousContent, Password = "test123" };
 
         // Act
         var response = await client.PostAsJsonAsync("/api/v1/auth/login", maliciousRequest);
@@ -44,7 +44,7 @@ public class InputValidationMiddlewareTests : IClassFixture<WebApplicationFactor
         
         // Create a request body larger than the configured limit
         var largeString = new string('A', 2 * 1024 * 1024); // 2MB, should exceed 1MB limit
-        var largeRequest = new { Username = "test", Password = largeString };
+        var largeRequest = new { Email = "test@example.com", Password = largeString };
 
         // Act
         var response = await client.PostAsJsonAsync("/api/v1/auth/login", largeRequest);
@@ -74,7 +74,7 @@ public class InputValidationMiddlewareTests : IClassFixture<WebApplicationFactor
     {
         // Arrange
         using var client = _factory.CreateClient();
-        var validRequest = new { Username = "testuser", Password = "ValidPassword123!" };
+        var validRequest = new { Email = "testuser@example.com", Password = "ValidPassword123!" };
 
         // Act
         var response = await client.PostAsJsonAsync("/api/v1/auth/login", validRequest);
