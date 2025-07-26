@@ -21,36 +21,9 @@ public class InputValidationMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Only validate POST, PUT, PATCH requests with content
-        if (!ShouldValidateRequest(context.Request))
-        {
-            await _next(context);
-            return;
-        }
-
         try
         {
-            // Enable buffering to allow reading the request body multiple times
-            context.Request.EnableBuffering();
-
-            // Read and validate request body
-            var requestBody = await ReadRequestBodyAsync(context.Request);
-
-            if (!string.IsNullOrEmpty(requestBody))
-            {
-                var validationResult = ValidateRequestBody(requestBody, context.Request.Path);
-
-                if (!validationResult.IsValid)
-                {
-                    await WriteValidationErrorResponse(context, validationResult);
-                    return;
-                }
-            }
-
-            // Reset stream position for downstream middleware
-            context.Request.Body.Position = 0;
-
-            // Validate query parameters
+            // Always validate query parameters and headers for all requests
             var queryValidationResult = ValidateQueryParameters(context.Request.Query);
             if (!queryValidationResult.IsValid)
             {
@@ -66,6 +39,30 @@ public class InputValidationMiddleware
                 return;
             }
 
+            // Only validate request body for POST, PUT, PATCH requests with content
+            if (ShouldValidateRequestBody(context.Request))
+            {
+                // Enable buffering to allow reading the request body multiple times
+                context.Request.EnableBuffering();
+
+                // Read and validate request body
+                var requestBody = await ReadRequestBodyAsync(context.Request);
+
+                if (!string.IsNullOrEmpty(requestBody))
+                {
+                    var validationResult = ValidateRequestBody(requestBody, context.Request.Path);
+
+                    if (!validationResult.IsValid)
+                    {
+                        await WriteValidationErrorResponse(context, validationResult);
+                        return;
+                    }
+                }
+
+                // Reset stream position for downstream middleware
+                context.Request.Body.Position = 0;
+            }
+
             await _next(context);
         }
         catch (Exception ex)
@@ -79,7 +76,7 @@ public class InputValidationMiddleware
         }
     }
 
-    private bool ShouldValidateRequest(HttpRequest request)
+    private bool ShouldValidateRequestBody(HttpRequest request)
     {
         var method = request.Method.ToUpperInvariant();
         return method is "POST" or "PUT" or "PATCH" && request.ContentLength > 0;

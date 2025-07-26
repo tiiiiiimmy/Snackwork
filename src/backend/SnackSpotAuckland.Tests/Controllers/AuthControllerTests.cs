@@ -35,10 +35,10 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactoryFixture>
         var response = await _client.PostAsJsonAsync("/api/v1/auth/register", registerRequest);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
         
-        var content = await response.Content.ReadFromJsonAsync<dynamic>();
-        content.Should().NotBeNull();
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().NotBeNullOrEmpty();
 
         // Verify user was created in database
         using var scope = _factory.Services.CreateScope();

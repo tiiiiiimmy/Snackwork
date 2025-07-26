@@ -21,10 +21,11 @@ public static class TestAuthHelper
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim("sub", user.Id.ToString()),
-                new Claim("username", user.Username),
-                new Claim("email", user.Email),
-                new Claim("level", user.Level.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim("level", user.Level.ToString()),
+                new Claim("experience", user.ExperiencePoints.ToString())
             }),
             Expires = DateTime.UtcNow.AddHours(1),
             Issuer = TestIssuer,
@@ -41,15 +42,22 @@ public static class TestAuthHelper
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(TestJwtKey);
         
+        var now = DateTime.UtcNow;
+        var expiredTime = now.AddHours(-1); // Expired 1 hour ago
+        var notBefore = expiredTime.AddHours(-1); // Not before 2 hours ago
+        
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim("sub", user.Id.ToString()),
-                new Claim("username", user.Username),
-                new Claim("email", user.Email)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim("level", user.Level.ToString()),
+                new Claim("experience", user.ExperiencePoints.ToString())
             }),
-            Expires = DateTime.UtcNow.AddHours(-1), // Expired 1 hour ago
+            NotBefore = notBefore,
+            Expires = expiredTime,
             Issuer = TestIssuer,
             Audience = TestAudience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

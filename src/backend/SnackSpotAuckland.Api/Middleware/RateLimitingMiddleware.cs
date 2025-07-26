@@ -26,6 +26,13 @@ public class RateLimitingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
+        // Skip rate limiting if disabled
+        if (!_options.EnableRateLimiting)
+        {
+            await _next(context);
+            return;
+        }
+
         var clientId = GetClientId(context);
         var endpoint = GetEndpoint(context);
 

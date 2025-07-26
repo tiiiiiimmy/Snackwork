@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SnackSpotAuckland.Api.Data;
 using SnackSpotAuckland.Api.Services;
+using SnackSpotAuckland.Api.Middleware;
 
 namespace SnackSpotAuckland.Tests.TestFixtures;
 
@@ -27,7 +28,9 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>
                 ["Jwt:Issuer"] = "SnackSpotAuckland.Tests",
                 ["Jwt:Audience"] = "SnackSpotAuckland.Tests",
                 ["Jwt:AccessTokenExpiryMinutes"] = "60",
-                ["Jwt:RefreshTokenExpiryDays"] = "30"
+                ["Jwt:RefreshTokenExpiryDays"] = "30",
+                // Disable rate limiting for tests
+                ["RateLimit:Enabled"] = "false"
             });
         });
         
@@ -57,6 +60,14 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>
 
             // Ensure other required services are registered
             services.AddScoped<IAuthService, AuthService>();
+            
+            // Disable rate limiting for tests
+            services.Configure<RateLimitOptions>(options =>
+            {
+                options.EnableRateLimiting = false;
+                options.EnableIpRateLimiting = false;
+                options.EnableUserRateLimiting = false;
+            });
         });
     }
 

@@ -191,10 +191,10 @@ public class ReviewsController : ControllerBase
     }
 
     /// <summary>
-    /// Update a review (only by the review author)
+    /// Update a review (only by owner)
     /// </summary>
     /// <param name="id">Review ID</param>
-    /// <param name="updateDto">Updated review data</param>
+    /// <param name="reviewDto">Updated review data</param>
     /// <returns>Updated review</returns>
     [HttpPut("{id}")]
     [Authorize]
@@ -203,7 +203,7 @@ public class ReviewsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<object>> UpdateReview(Guid id, [FromBody] UpdateReviewDto updateDto)
+    public async Task<ActionResult<object>> UpdateReview(Guid id, [FromBody] CreateReviewDto reviewDto)
     {
         try
         {
@@ -219,52 +219,87 @@ public class ReviewsController : ControllerBase
                 return Unauthorized(new { message = "Invalid user" });
             }
 
-            var review = await _context.Reviews
-                .Include(r => r.Snack)
+            var existingReview = await _context.Reviews
+                .Include(r => r.User)
                 .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (existingReview == null)
+            {
+                return NotFound(new { message = "Review not found" });
+            }
+
+            // Check if user owns this review
+            if (existingReview.UserId != userId)
+            {
+                return Forbid();
+            }
+
+            // Update review properties
+            existingReview.Rating = reviewDto.Rating;
+            existingReview.Comment = reviewDto.Comment;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                existingReview.Id,
+                existingReview.Rating,
+                existingReview.Comment,
+                existingReview.CreatedAt,
+                existingReview.SnackId,
+                Username = existingReview.User?.Username ?? "Unknown"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating review");
+            return StatusCode(500, new { message = "Internal server error" });
+        }
+    }
+
+    /// <summary>
+    /// Delete a review (only by owner)
+    /// </summary>
+    /// <param name="id">Review ID</param>
+    /// <returns>No content</returns>
+    [HttpDelete("{id}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteReview(Guid id)
+    {
+        try
+        {
+            // Get user ID from JWT token
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user" });
+            }
+
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
 
             if (review == null)
             {
                 return NotFound(new { message = "Review not found" });
             }
 
-            // Check if the user owns this review
+            // Check if user owns this review
             if (review.UserId != userId)
             {
-                return Forbid("You can only update your own reviews");
+                return Forbid();
             }
 
-            var oldRating = review.Rating;
-            review.Rating = updateDto.Rating;
-            review.Comment = updateDto.Comment;
-            review.UpdatedAt = DateTime.UtcNow;
-
-            // Recalculate snack's average rating if rating changed
-            if (oldRating != updateDto.Rating)
-            {
-                var allReviews = await _context.Reviews
-                    .Where(r => r.SnackId == review.SnackId && !r.IsHidden)
-                    .ToListAsync();
-
-                review.Snack.AverageRating = (decimal)allReviews.Average(r => r.Rating);
-            }
-
+            _context.Reviews.Remove(review);
             await _context.SaveChangesAsync();
 
-            var result = new
-            {
-                review.Id,
-                review.SnackId,
-                review.Rating,
-                review.Comment,
-                review.UpdatedAt
-            };
-
-            return Ok(result);
+            return NoContent();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating review {ReviewId}", id);
+            _logger.LogError(ex, "Error deleting review");
             return StatusCode(500, new { message = "Internal server error" });
         }
     }
