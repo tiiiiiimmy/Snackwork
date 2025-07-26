@@ -32,6 +32,9 @@ jobs:
         cd src/backend/SnackSpotAuckland.Api
         dotnet list package --vulnerable --include-transitive || true
         dotnet list package --outdated || true
+        cd ../SnackSpotAuckland.Tests
+        dotnet list package --vulnerable --include-transitive || true
+        dotnet list package --outdated || true
     
     - name: npm Security Scan
       run: |
@@ -46,8 +49,9 @@ jobs:
     
     - name: Build for CodeQL
       run: |
-        cd src/backend/SnackSpotAuckland.Api && dotnet build
-        cd ../../../src/frontend && npm ci && npm run build
+        dotnet build src/backend/SnackSpotAuckland.Api/SnackSpotAuckland.Api.csproj
+        dotnet build src/backend/SnackSpotAuckland.Tests/SnackSpotAuckland.Tests.csproj
+        cd src/frontend && npm ci && npm run build
     
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

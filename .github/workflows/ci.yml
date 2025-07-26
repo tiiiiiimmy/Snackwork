@@ -49,13 +49,13 @@ jobs:
           ${{ runner.os }}-nuget-
     
     - name: Restore dependencies
-      run: dotnet restore src/backend/SnackSpotAuckland.Api/SnackSpotAuckland.Api.csproj
+      run: dotnet restore src/backend/SnackSpotAuckland.Tests/SnackSpotAuckland.Tests.csproj
     
     - name: Build backend
-      run: dotnet build src/backend/SnackSpotAuckland.Api/SnackSpotAuckland.Api.csproj --no-restore --configuration Release
+      run: dotnet build src/backend/SnackSpotAuckland.Tests/SnackSpotAuckland.Tests.csproj --no-restore --configuration Release
     
     - name: Run backend tests
-      run: dotnet test src/backend/SnackSpotAuckland.Api/SnackSpotAuckland.Api.csproj --no-build --configuration Release --logger trx --collect:"XPlat Code Coverage"
+      run: dotnet test src/backend/SnackSpotAuckland.Tests/SnackSpotAuckland.Tests.csproj --no-build --configuration Release --logger trx --collect:"XPlat Code Coverage"
       env:
         ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=snackspot_test;Username=testuser;Password=testpass"
     
