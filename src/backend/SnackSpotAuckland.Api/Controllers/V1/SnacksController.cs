@@ -59,20 +59,20 @@ public class SnacksController : ControllerBase
 
             // Check if we're using an in-memory database (tests) or PostgreSQL (production)
             var isInMemoryDb = _context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory";
-            
+
             IQueryable<Snack> query;
-            
+
             if (isInMemoryDb)
             {
                 // For in-memory database (tests), use simple filtering
                 // Note: This is less accurate but works for testing
                 var latRange = radius / 111000.0; // Rough conversion: 1 degree ≈ 111km
                 var lngRange = radius / (111000.0 * Math.Cos(lat * Math.PI / 180));
-                
+
                 query = _context.Snacks
                     .Include(s => s.Category)
                     .Include(s => s.User)
-                    .Where(s => Math.Abs(s.Location.Y - lat) <= latRange && 
+                    .Where(s => Math.Abs(s.Location.Y - lat) <= latRange &&
                                Math.Abs(s.Location.X - lng) <= lngRange);
             }
             else
@@ -97,8 +97,8 @@ public class SnacksController : ControllerBase
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var searchLower = search.ToLower();
-                query = query.Where(s => 
-                    s.Name.ToLower().Contains(searchLower) || 
+                query = query.Where(s =>
+                    s.Name.ToLower().Contains(searchLower) ||
                     (s.Description != null && s.Description.ToLower().Contains(searchLower)) ||
                     (s.ShopName != null && s.ShopName.ToLower().Contains(searchLower)));
             }
@@ -320,7 +320,7 @@ public class SnacksController : ControllerBase
             existingSnack.ImageUrl = snackDto.ImageUrl;
             existingSnack.ShopName = snackDto.ShopName;
             existingSnack.ShopAddress = snackDto.ShopAddress;
-            
+
             // Update location if provided
             var location = _geometryFactory.CreatePoint(new Coordinate(snackDto.Location.Lng, snackDto.Location.Lat));
             existingSnack.Location = location;
