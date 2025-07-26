@@ -174,10 +174,11 @@ public class ReviewsController : ControllerBase
                 .Select(r => new
                 {
                     r.Id,
+                    r.SnackId,
                     r.Rating,
                     r.Comment,
                     r.CreatedAt,
-                    User = new { r.User.Id, r.User.Username }
+                    Username = r.User.Username
                 })
                 .ToListAsync();
 

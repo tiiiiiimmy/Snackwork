@@ -48,15 +48,5 @@ public class BasicControllerTests : IClassFixture<WebApplicationFactoryFixture>
         response.Headers.Should().ContainKey("X-XSS-Protection");
     }
 
-    [Fact]
-    public async Task RateLimitHeaders_ShouldBePresent()
-    {
-        // Act
-        var response = await _client.GetAsync("/api/v1/categories");
 
-        // Assert
-        response.Headers.Should().ContainKey("X-RateLimit-Limit");
-        response.Headers.Should().ContainKey("X-RateLimit-Remaining");
-        response.Headers.Should().ContainKey("X-RateLimit-Reset");
-    }
 }

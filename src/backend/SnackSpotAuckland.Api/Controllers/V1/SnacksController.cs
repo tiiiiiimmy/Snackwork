@@ -45,6 +45,13 @@ public class SnacksController : ControllerBase
     {
         try
         {
+            // Check if required parameters are provided by checking the raw query string
+            var queryString = HttpContext.Request.QueryString.Value;
+            if (string.IsNullOrEmpty(queryString) || !queryString.Contains("lat=") || !queryString.Contains("lng="))
+            {
+                return BadRequest(new { message = "Latitude and longitude parameters are required" });
+            }
+
             if (lat < -90 || lat > 90 || lng < -180 || lng > 180)
             {
                 return BadRequest(new { message = "Invalid latitude or longitude values" });
