@@ -65,10 +65,9 @@ export interface CreateSnackRequest {
   description?: string;
   categoryId: string;
   imageUrl?: string;
-  latitude: number;
-  longitude: number;
-  location: string;
-  price: number;
+  location: Location;
+  shopName?: string;
+  shopAddress?: string;
 }
 
 // Review types

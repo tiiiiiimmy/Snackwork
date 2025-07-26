@@ -364,7 +364,7 @@ public class InputValidationMiddleware
             "Accept-Language", "Host", "Origin", "Referer", "Connection", "Cache-Control", "Cookie",
             "X-Requested-With", "X-Forwarded-For", "X-Real-IP", "X-Forwarded-Proto",
             // Browser security headers
-            "Sec-CH-UA", "Sec-CH-UA-Mobile", "Sec-CH-UA-Platform", "Sec-Fetch-Site", "Sec-Fetch-Mode", 
+            "Sec-CH-UA", "Sec-CH-UA-Mobile", "Sec-CH-UA-Platform", "Sec-Fetch-Site", "Sec-Fetch-Mode",
             "Sec-Fetch-User", "Sec-Fetch-Dest", "Upgrade-Insecure-Requests",
             // Additional standard headers
             "DNT", "Content-Encoding", "Transfer-Encoding", "TE", "Pragma", "Expires",

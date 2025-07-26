@@ -25,19 +25,19 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> RegisterAsync(RegisterDto registerDto)
     {
-        _logger.LogInformation("AuthService.RegisterAsync started for email: {Email}, username: {Username}", 
+        _logger.LogInformation("AuthService.RegisterAsync started for email: {Email}, username: {Username}",
             registerDto.Email, registerDto.Username);
-        
+
         try
         {
-            _logger.LogInformation("Checking for existing user with email: {Email} or username: {Username}", 
+            _logger.LogInformation("Checking for existing user with email: {Email} or username: {Username}",
                 registerDto.Email, registerDto.Username);
-            
+
             // Check if user already exists
             var existingUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == registerDto.Email.ToLower() ||
                                          u.Username.ToLower() == registerDto.Username.ToLower());
-            
+
             _logger.LogInformation("Existing user check completed. Found existing user: {Found}", existingUser != null);
 
             if (existingUser != null)
@@ -50,9 +50,9 @@ public class AuthService : IAuthService
             }
 
             // Create new user
-            _logger.LogInformation("Creating new user with email: {Email}, username: {Username}", 
+            _logger.LogInformation("Creating new user with email: {Email}, username: {Username}",
                 registerDto.Email, registerDto.Username);
-            
+
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -67,7 +67,7 @@ public class AuthService : IAuthService
 
             _logger.LogInformation("Adding user to database context with ID: {UserId}", user.Id);
             _context.Users.Add(user);
-            
+
             _logger.LogInformation("Saving changes to database");
             await _context.SaveChangesAsync();
             _logger.LogInformation("Database changes saved successfully");
