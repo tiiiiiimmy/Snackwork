@@ -1,18 +1,11 @@
 version: 2
 updates:
-  # Enable version updates for npm (frontend)
+  # Frontend dependencies
   - package-ecosystem: "npm"
     directory: "/src/frontend"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "02:00"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "snackspot-team"
-    commit-message:
-      prefix: "feat"
-      include: "scope"
+    open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "frontend"
@@ -20,19 +13,12 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
-  # Enable version updates for NuGet (backend)
+  # Backend dependencies
   - package-ecosystem: "nuget"
     directory: "/src/backend/SnackSpotAuckland.Api"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "02:00"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "snackspot-team"
-    commit-message:
-      prefix: "feat"
-      include: "scope"
+    open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "backend"
@@ -40,16 +26,11 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
-  # Monitor GitHub Actions
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "02:00"
-    commit-message:
-      prefix: "ci"
-      include: "scope"
+      interval: "monthly"
     labels:
       - "dependencies"
-      - "github-actions"
+      - "ci"
