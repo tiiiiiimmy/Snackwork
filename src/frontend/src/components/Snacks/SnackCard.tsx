@@ -97,7 +97,7 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
           {snack.category && (
             <div className="snack-category">
               <span className="category-badge" data-testid="category-badge">
-                {snack.category.name}
+                {typeof snack.category === 'string' ? snack.category : snack.category.name}
               </span>
             </div>
           )}

@@ -68,7 +68,7 @@ class PerformanceMonitor {
       
       try {
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-      } catch (e) {
+      } catch {
         // Fallback for browsers that don't support LCP
         console.debug('LCP observation not supported');
       }
@@ -77,8 +77,9 @@ class PerformanceMonitor {
       let clsValue = 0;
       const clsObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          if (!(entry as any).hadRecentInput) {
-            clsValue += (entry as any).value;
+          const layoutShift = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+          if (!layoutShift.hadRecentInput) {
+            clsValue += layoutShift.value || 0;
           }
         }
         this.recordMetric('CLS', clsValue);
@@ -86,20 +87,21 @@ class PerformanceMonitor {
       
       try {
         clsObserver.observe({ entryTypes: ['layout-shift'] });
-      } catch (e) {
+      } catch {
         console.debug('CLS observation not supported');
       }
 
       // FID - First Input Delay
       const fidObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          this.recordMetric('FID', (entry as any).processingStart - entry.startTime);
+          const fidEntry = entry as PerformanceEntry & { processingStart?: number };
+          this.recordMetric('FID', (fidEntry.processingStart || 0) - entry.startTime);
         }
       });
       
       try {
         fidObserver.observe({ entryTypes: ['first-input'] });
-      } catch (e) {
+      } catch {
         console.debug('FID observation not supported');
       }
     }
@@ -128,7 +130,7 @@ class PerformanceMonitor {
       
       try {
         markObserver.observe({ entryTypes: ['mark', 'measure'] });
-      } catch (e) {
+      } catch {
         console.debug('Custom marks observation not supported');
       }
     }
@@ -237,7 +239,7 @@ class PerformanceMonitor {
     const report: Record<string, { value: number; rating: string } | null> = {};
 
     for (const vital of vitals) {
-      const metric = this.metrics.findLast(m => m.name === vital);
+      const metric = this.metrics.filter(m => m.name === vital).pop();
       report[vital] = metric ? { value: metric.value, rating: metric.rating || 'unknown' } : null;
     }
 
@@ -278,18 +280,21 @@ class PerformanceMonitor {
   getResourceTimings() {
     if (typeof performance === 'undefined') return [];
 
-    return performance.getEntriesByType('resource').map((entry: PerformanceResourceTiming) => ({
-      name: entry.name,
-      duration: entry.duration,
-      size: entry.transferSize || 0,
-      type: this.getResourceType(entry.name),
-      timing: {
-        dns: entry.domainLookupEnd - entry.domainLookupStart,
-        tcp: entry.connectEnd - entry.connectStart,
-        request: entry.responseStart - entry.requestStart,
-        response: entry.responseEnd - entry.responseStart
-      }
-    }));
+    return performance.getEntriesByType('resource').map((entry) => {
+      const resourceEntry = entry as PerformanceResourceTiming;
+      return {
+        name: resourceEntry.name,
+        duration: resourceEntry.duration,
+        size: resourceEntry.transferSize || 0,
+        type: this.getResourceType(resourceEntry.name),
+        timing: {
+          dns: resourceEntry.domainLookupEnd - resourceEntry.domainLookupStart,
+          tcp: resourceEntry.connectEnd - resourceEntry.connectStart,
+          request: resourceEntry.responseStart - resourceEntry.requestStart,
+          response: resourceEntry.responseEnd - resourceEntry.responseStart
+        }
+      };
+    });
   }
 
   private getResourceType(url: string): string {
@@ -318,11 +323,11 @@ export function usePerformanceMonitor() {
 }
 
 // Helper to track component render performance
-export function withPerformanceTracking<T extends React.ComponentType<any>>(
+export function withPerformanceTracking<T extends React.ComponentType<Record<string, unknown>>>(
   Component: T,
   componentName: string
 ): T {
-  const WrappedComponent = (props: any) => {
+  const WrappedComponent = (props: Record<string, unknown>) => {
     React.useEffect(() => {
       performanceMonitor.mark(`${componentName}-mount-start`);
       

@@ -160,7 +160,7 @@ export const SnackDetail: React.FC = () => {
                     {snack.averageRating.toFixed(1)}
                   </span>
                   <span className="rating-text">
-                    ({snack.reviewCount} review{snack.reviewCount !== 1 ? 's' : ''})
+                    ({snack.totalRatings} review{snack.totalRatings !== 1 ? 's' : ''})
                   </span>
                 </div>
               </div>
@@ -169,7 +169,7 @@ export const SnackDetail: React.FC = () => {
               {snack.category && (
                 <div className="category-section">
                   <span className="status-badge status-info">
-                    {snack.category.name}
+                    {typeof snack.category === 'string' ? snack.category : snack.category.name}
                   </span>
                 </div>
               )}

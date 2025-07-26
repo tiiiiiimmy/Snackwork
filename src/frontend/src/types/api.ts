@@ -45,7 +45,7 @@ export interface Snack {
   name: string;
   description?: string;
   categoryId?: string;
-  category?: string; // Category name from API
+  category?: Category | string; // Category object or name from API
   imageUrl?: string;
   location: Location; // Coordinates object
   shopName?: string; // Shop/store name

@@ -19,7 +19,7 @@ export interface HealthCheck {
   status: 'pass' | 'fail' | 'warn';
   duration: number;
   message?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 class HealthMonitor {
@@ -29,7 +29,6 @@ class HealthMonitor {
 
   async performHealthCheck(): Promise<HealthStatus> {
     const checks: HealthCheck[] = [];
-    const startTime = performance.now();
 
     // Check API connectivity
     checks.push(await this.checkApiHealth());
@@ -111,10 +110,10 @@ class HealthMonitor {
     
     const missingFeatures = requiredFeatures.filter(feature => {
       const keys = feature.split('.');
-      let obj: any = window;
+      let obj: Record<string, unknown> = window as unknown as Record<string, unknown>;
       for (const key of keys) {
         if (!(key in obj)) return true;
-        obj = obj[key];
+        obj = obj[key] as Record<string, unknown>;
       }
       return false;
     });
@@ -230,7 +229,7 @@ class HealthMonitor {
 
     try {
       // Check memory usage if available
-      const memory = (performance as any).memory;
+      const memory = (performance as unknown as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
       let memoryWarning = false;
       let memoryDetails = {};
 

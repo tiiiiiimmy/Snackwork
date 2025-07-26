@@ -11,19 +11,19 @@ public class SwaggerOperationFilter : IOperationFilter
         if (operation.Responses.ContainsKey("200"))
         {
             operation.Responses["200"].Headers ??= new Dictionary<string, OpenApiHeader>();
-            
+
             operation.Responses["200"].Headers.Add("X-RateLimit-Limit", new OpenApiHeader
             {
                 Description = "The number of allowed requests in the current period",
                 Schema = new OpenApiSchema { Type = "integer" }
             });
-            
+
             operation.Responses["200"].Headers.Add("X-RateLimit-Remaining", new OpenApiHeader
             {
                 Description = "The number of remaining requests in the current period",
                 Schema = new OpenApiSchema { Type = "integer" }
             });
-            
+
             operation.Responses["200"].Headers.Add("X-RateLimit-Reset", new OpenApiHeader
             {
                 Description = "The timestamp when the rate limit resets",
@@ -47,8 +47,8 @@ public class SwaggerOperationFilter : IOperationFilter
                             Properties = new Dictionary<string, OpenApiSchema>
                             {
                                 ["message"] = new OpenApiSchema { Type = "string" },
-                                ["errors"] = new OpenApiSchema 
-                                { 
+                                ["errors"] = new OpenApiSchema
+                                {
                                     Type = "object",
                                     AdditionalProperties = new OpenApiSchema { Type = "array", Items = new OpenApiSchema { Type = "string" } }
                                 }

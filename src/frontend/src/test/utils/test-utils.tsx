@@ -35,6 +35,7 @@ const customRender = (
   ui: React.ReactElement,
   options: ExtendedRenderOptions = {}
 ) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user, ...renderOptions } = options
 
   return render(ui, {
