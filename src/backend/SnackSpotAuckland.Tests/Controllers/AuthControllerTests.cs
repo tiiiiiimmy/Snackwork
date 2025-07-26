@@ -154,9 +154,9 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactoryFixture>
         loginResponse.ExpiresAt.Should().BeAfter(DateTime.UtcNow);
 
         // Verify refresh token was stored
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-        var refreshToken = context.RefreshTokens.FirstOrDefault(rt => rt.UserId == user.Id);
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var refreshToken = verifyContext.RefreshTokens.FirstOrDefault(rt => rt.UserId == user.Id);
         refreshToken.Should().NotBeNull();
     }
 
@@ -315,9 +315,9 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactoryFixture>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         // Verify refresh tokens were revoked
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-        var tokens = context.RefreshTokens.Where(rt => rt.UserId == user.Id).ToList();
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var tokens = verifyContext.RefreshTokens.Where(rt => rt.UserId == user.Id).ToList();
         tokens.Should().AllSatisfy(t => t.IsRevoked.Should().BeTrue());
     }
 

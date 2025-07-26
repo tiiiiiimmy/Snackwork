@@ -59,9 +59,9 @@ public class ReviewsControllerTests : IClassFixture<WebApplicationFactoryFixture
         createdReview.SnackId.Should().Be(snack.Id);
 
         // Verify in database
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-        var dbReview = context.Reviews.FirstOrDefault(r => r.Id == createdReview.Id);
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var dbReview = verifyContext.Reviews.FirstOrDefault(r => r.Id == createdReview.Id);
         dbReview.Should().NotBeNull();
         dbReview!.UserId.Should().Be(user.Id);
     }
@@ -323,9 +323,9 @@ public class ReviewsControllerTests : IClassFixture<WebApplicationFactoryFixture
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         // Verify deletion in database
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-        var deletedReview = context.Reviews.FirstOrDefault(r => r.Id == review.Id);
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var deletedReview = verifyContext.Reviews.FirstOrDefault(r => r.Id == review.Id);
         deletedReview.Should().BeNull();
     }
 
@@ -359,9 +359,9 @@ public class ReviewsControllerTests : IClassFixture<WebApplicationFactoryFixture
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
         // Verify review still exists
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-        var existingReview = context.Reviews.FirstOrDefault(r => r.Id == review.Id);
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var existingReview = verifyContext.Reviews.FirstOrDefault(r => r.Id == review.Id);
         existingReview.Should().NotBeNull();
     }
 

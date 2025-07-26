@@ -52,8 +52,7 @@ public static class TestDataFactory
             AverageRating = Faker.Random.Decimal(1, 5),
             TotalRatings = Faker.Random.Int(0, 100),
             DataSource = Faker.PickRandom<DataSource>(),
-            CreatedAt = DateTime.UtcNow.AddDays(-Faker.Random.Int(1, 90)),
-            UpdatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow.AddDays(-Faker.Random.Int(1, 90))
         };
     }
 
@@ -78,7 +77,7 @@ public static class TestDataFactory
             Id = Guid.NewGuid(),
             Token = Guid.NewGuid().ToString(),
             UserId = userId,
-            ExpiryDate = DateTime.UtcNow.AddDays(30),
+            ExpiresAt = DateTime.UtcNow.AddDays(30),
             IsRevoked = false,
             CreatedAt = DateTime.UtcNow
         };

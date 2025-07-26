@@ -13,9 +13,14 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>
     {
         builder.ConfigureServices(services =>
         {
-            // Remove the app's DbContext registration
-            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<SnackSpotDbContext>));
-            if (descriptor != null)
+            // Remove the app's DbContext registration and related services
+            var descriptors = services.Where(d => 
+                d.ServiceType == typeof(DbContextOptions<SnackSpotDbContext>) ||
+                d.ServiceType == typeof(SnackSpotDbContext) ||
+                d.ServiceType.IsGenericType && d.ServiceType.GetGenericTypeDefinition() == typeof(DbContextOptions<>)
+            ).ToArray();
+            
+            foreach (var descriptor in descriptors)
             {
                 services.Remove(descriptor);
             }
@@ -24,7 +29,7 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>
             services.AddDbContext<SnackSpotDbContext>(options =>
             {
                 options.UseInMemoryDatabase("TestDatabase");
-                options.UseNetTopologySuite(); // For spatial data support
+                // Note: InMemory database doesn't support spatial data, so UseNetTopologySuite() is not needed
             });
 
             // Disable logging during tests

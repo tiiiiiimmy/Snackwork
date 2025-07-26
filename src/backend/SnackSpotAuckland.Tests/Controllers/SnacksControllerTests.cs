@@ -169,9 +169,9 @@ public class SnacksControllerTests : IClassFixture<WebApplicationFactoryFixture>
         createdSnack.ShopName.Should().Be(createRequest.ShopName);
 
         // Verify in database
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-        var dbSnack = context.Snacks.FirstOrDefault(s => s.Id == createdSnack.Id);
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var dbSnack = verifyContext.Snacks.FirstOrDefault(s => s.Id == createdSnack.Id);
         dbSnack.Should().NotBeNull();
         dbSnack!.UserId.Should().Be(user.Id);
     }
@@ -365,9 +365,9 @@ public class SnacksControllerTests : IClassFixture<WebApplicationFactoryFixture>
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         // Verify deletion in database
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-        var deletedSnack = context.Snacks.FirstOrDefault(s => s.Id == snack.Id);
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var deletedSnack = verifyContext.Snacks.FirstOrDefault(s => s.Id == snack.Id);
         deletedSnack.Should().BeNull();
     }
 
@@ -399,9 +399,9 @@ public class SnacksControllerTests : IClassFixture<WebApplicationFactoryFixture>
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
         // Verify snack still exists
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-        var existingSnack = context.Snacks.FirstOrDefault(s => s.Id == snack.Id);
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var existingSnack = verifyContext.Snacks.FirstOrDefault(s => s.Id == snack.Id);
         existingSnack.Should().NotBeNull();
     }
 
