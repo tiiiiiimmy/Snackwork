@@ -12,7 +12,7 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
-    const ratingText = `${rating.toFixed(1)} out of 5 stars, based on ${snack.reviewCount} reviews`;
+    const ratingText = `${rating.toFixed(1)} out of 5 stars, based on ${snack.totalRatings} reviews`;
 
     return (
       <div className="snack-rating" aria-label={ratingText}>
@@ -37,7 +37,7 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
           })}
         </div>
         <span className="rating-value" aria-hidden="true">
-          {rating.toFixed(1)} ({snack.reviewCount})
+          {rating.toFixed(1)} ({snack.totalRatings})
         </span>
       </div>
     );
@@ -47,7 +47,7 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
     <Link 
       to={`/snacks/${snack.id}`} 
       className="snack-card-link"
-      aria-label={`View details for ${snack.name} - ${snack.averageRating.toFixed(1)} stars, $${snack.price.toFixed(2)}`}
+      aria-label={`View details for ${snack.name} - ${snack.averageRating.toFixed(1)} stars`}
     >
       <div className="snack-card" data-testid="snack-card">
         {/* Image */}
@@ -71,10 +71,12 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
               {snack.name}
             </h3>
 
-            <div className="snack-location">
-              <MapPinIcon aria-hidden="true" />
-              <span>{snack.location}</span>
-            </div>
+            {snack.shopName && (
+              <div className="snack-location">
+                <MapPinIcon aria-hidden="true" />
+                <span>{snack.shopName}</span>
+              </div>
+            )}
           </div>
 
           {snack.description && (
@@ -85,9 +87,11 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
 
           <div className="snack-meta">
             {renderStars(snack.averageRating)}
-            <span className="snack-price">
-              ${snack.price.toFixed(2)}
-            </span>
+            {snack.shopName && (
+              <span className="snack-shop">
+                {snack.shopName}
+              </span>
+            )}
           </div>
 
           {snack.category && (

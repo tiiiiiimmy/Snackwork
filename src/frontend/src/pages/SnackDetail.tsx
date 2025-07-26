@@ -145,9 +145,11 @@ export const SnackDetail: React.FC = () => {
             <div className="snack-header">
               <div className="snack-header-top">
                 <h1 className="snack-name">{snack.name}</h1>
-                <span className="price-display">
-                  ${snack.price.toFixed(2)}
-                </span>
+                {snack.shopName && (
+                  <span className="shop-name">
+                    {snack.shopName}
+                  </span>
+                )}
               </div>
 
               {/* Rating */}
@@ -181,10 +183,12 @@ export const SnackDetail: React.FC = () => {
 
               {/* Location and Meta */}
               <div className="snack-meta-info">
-                <div className="snack-location">
-                  <MapPinIcon />
-                  <span>{snack.location}</span>
-                </div>
+                {snack.shopName && (
+                  <div className="snack-location">
+                    <MapPinIcon />
+                    <span>{snack.shopName}</span>
+                  </div>
+                )}
                 <div className="snack-location">
                   <UserIcon />
                   <span>Added by {snack.user.username}</span>

@@ -44,15 +44,14 @@ export interface Snack {
   id: string;
   name: string;
   description?: string;
-  categoryId: string;
-  category?: Category;
+  categoryId?: string;
+  category?: string; // Category name from API
   imageUrl?: string;
-  latitude: number;
-  longitude: number;
-  location: string; // address/shop name
-  price: number;
+  location: Location; // Coordinates object
+  shopName?: string; // Shop/store name
+  shopAddress?: string; // Shop address
   averageRating: number;
-  reviewCount: number;
+  totalRatings: number;
   createdAt: string;
   user: {
     id: string;
