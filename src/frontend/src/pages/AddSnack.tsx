@@ -117,10 +117,11 @@ export const AddSnack: React.FC = () => {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         categoryId: formData.categoryId,
-        price: Number(formData.price),
-        location: formData.location.trim(),
-        latitude: formData.coordinates!.lat,
-        longitude: formData.coordinates!.lng,
+        location: {
+          lat: formData.coordinates!.lat,
+          lng: formData.coordinates!.lng,
+        },
+        shopName: formData.location.trim(),
         imageUrl: formData.imageUrl.trim() || undefined,
       };
 

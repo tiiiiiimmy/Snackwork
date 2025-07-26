@@ -110,8 +110,10 @@ describe('API Service', () => {
         name: 'New Snack',
         description: 'Description',
         categoryId: 'cat-1',
-        latitude: -36.8485,
-        longitude: 174.7633,
+        location: {
+          lat: -36.8485,
+          lng: 174.7633
+        },
         shopName: 'Shop',
         shopAddress: 'Address'
       }
