@@ -1,7 +1,26 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { AuthProvider, useAuth } from '../AuthContext'
 import { mockUser } from '../../test/mocks/data'
+
+// Create hoisted mock functions
+const mockLogin = vi.hoisted(() => vi.fn())
+const mockRegister = vi.hoisted(() => vi.fn())
+const mockLogout = vi.hoisted(() => vi.fn())
+const mockRefreshToken = vi.hoisted(() => vi.fn())
+
+// Mock the API service with hoisted functions
+vi.mock('../../services/api', () => ({
+  default: {
+    login: mockLogin,
+    register: mockRegister,
+    logout: mockLogout,
+    refreshToken: mockRefreshToken,
+  }
+}))
+
+// Import after mocking
+import { AuthProvider } from '../AuthContext'
+import { useAuth } from '../../hooks/useAuth'
 
 // Test component to access auth context
 const TestComponent = () => {
@@ -32,19 +51,14 @@ const TestComponent = () => {
   )
 }
 
-// Mock the API service
-vi.mock('../services/api', () => ({
-  default: {
-    login: vi.fn().mockResolvedValue({ user: mockUser }),
-    register: vi.fn().mockResolvedValue({ user: mockUser }),
-    logout: vi.fn().mockResolvedValue({}),
-    refreshToken: vi.fn().mockResolvedValue({ user: mockUser }),
-  }
-}))
-
 describe('AuthContext', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Setup default mock returns
+    mockLogin.mockResolvedValue({ user: mockUser })
+    mockRegister.mockResolvedValue({ user: mockUser })
+    mockLogout.mockResolvedValue({})
+    mockRefreshToken.mockRejectedValue(new Error('No token'))
   })
 
   it('provides initial state when no user is authenticated', () => {
@@ -57,14 +71,19 @@ describe('AuthContext', () => {
     expect(screen.getByTestId('user-info')).toHaveTextContent('Not logged in')
   })
 
-  it('provides user when initially authenticated', () => {
+  it('provides user when initially authenticated', async () => {
+    // Mock successful token refresh for this test
+    mockRefreshToken.mockResolvedValueOnce({ user: mockUser })
+    
     render(
-      <AuthProvider initialUser={mockUser}>
+      <AuthProvider>
         <TestComponent />
       </AuthProvider>
     )
     
-    expect(screen.getByTestId('user-info')).toHaveTextContent(`Welcome ${mockUser.username}`)
+    await waitFor(() => {
+      expect(screen.getByTestId('user-info')).toHaveTextContent(`Welcome ${mockUser.username}`)
+    })
   })
 
   it('handles login successfully', async () => {
@@ -98,15 +117,22 @@ describe('AuthContext', () => {
   })
 
   it('handles logout successfully', async () => {
+    // First login to have something to logout from
     render(
-      <AuthProvider initialUser={mockUser}>
+      <AuthProvider>
         <TestComponent />
       </AuthProvider>
     )
     
-    // Initially logged in
-    expect(screen.getByTestId('user-info')).toHaveTextContent(`Welcome ${mockUser.username}`)
+    // Login first
+    const loginBtn = screen.getByTestId('login-btn')
+    fireEvent.click(loginBtn)
     
+    await waitFor(() => {
+      expect(screen.getByTestId('user-info')).toHaveTextContent(`Welcome ${mockUser.username}`)
+    })
+    
+    // Then logout
     const logoutBtn = screen.getByTestId('logout-btn')
     fireEvent.click(logoutBtn)
     

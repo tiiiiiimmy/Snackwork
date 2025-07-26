@@ -1,8 +1,19 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { useState, useEffect, createContext } from 'react';
 import type { ReactNode } from 'react';
 import type { User, RegisterRequest, LoginRequest } from '../types/api';
-import { AuthContext, type AuthContextType } from './AuthContext';
 import apiService from '../services/api';
+
+export interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  login: (credentials: LoginRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+}
+
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 
 interface AuthProviderProps {

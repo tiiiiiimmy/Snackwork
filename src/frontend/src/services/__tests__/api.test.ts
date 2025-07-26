@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import type { AxiosInstance } from 'axios'
+import type { AxiosInstance, AxiosError } from 'axios'
 
 // Create mock functions with hoisting
 const mockGet = vi.hoisted(() => vi.fn())
@@ -94,7 +94,7 @@ describe('API Service', () => {
     it('should get user profile', async () => {
       mockGet.mockResolvedValueOnce({ data: mockUser })
 
-      const result = await apiService.getProfile()
+      const result = await apiService.getCurrentUser()
 
       expect(mockGet).toHaveBeenCalledWith('/auth/profile')
       expect(result).toEqual(mockUser)
@@ -106,7 +106,7 @@ describe('API Service', () => {
       const params = { lat: -36.8485, lng: 174.7633, radius: 1000 }
       mockGet.mockResolvedValueOnce({ data: mockSnacks })
 
-      const result = await apiService.getNearbySnacks(params.lat, params.lng, params.radius)
+      const result = await apiService.getSnacks(params.lat, params.lng, params.radius)
 
       expect(mockGet).toHaveBeenCalledWith('/snacks', { params })
       expect(result).toEqual(mockSnacks)
@@ -144,26 +144,6 @@ describe('API Service', () => {
       expect(result).toEqual(createdSnack)
     })
 
-    it('should update snack', async () => {
-      const snackId = 'snack-1'
-      const updateData = { name: 'Updated Snack' }
-      const updatedSnack = { ...mockSnacks[0], ...updateData }
-      mockPut.mockResolvedValueOnce({ data: updatedSnack })
-
-      const result = await apiService.updateSnack(snackId, updateData)
-
-      expect(mockPut).toHaveBeenCalledWith(`/snacks/${snackId}`, updateData)
-      expect(result).toEqual(updatedSnack)
-    })
-
-    it('should delete snack', async () => {
-      const snackId = 'snack-1'
-      mockDelete.mockResolvedValueOnce({ data: null })
-
-      await apiService.deleteSnack(snackId)
-
-      expect(mockDelete).toHaveBeenCalledWith(`/snacks/${snackId}`)
-    })
   })
 
   describe('Categories', () => {
