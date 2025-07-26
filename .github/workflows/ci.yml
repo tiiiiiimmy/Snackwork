@@ -7,8 +7,8 @@ on:
     branches: [ main, develop ]
 
 env:
-  DOTNET_VERSION: '8.0.x'
-  NODE_VERSION: '18.x'
+  DOTNET_VERSION: '9.0.x'
+  NODE_VERSION: '20.x'
 
 jobs:
   # Backend CI/CD
@@ -38,6 +38,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
     
     - name: Cache .NET packages
       uses: actions/cache@v4
@@ -162,6 +163,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
