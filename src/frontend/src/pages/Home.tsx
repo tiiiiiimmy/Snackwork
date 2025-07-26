@@ -13,11 +13,14 @@ export const Home: React.FC = () => {
   const [mapCenter, setMapCenter] = useState<Location | undefined>(location || undefined);
   const [searchRadius, setSearchRadius] = useState(1000);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
 
   const { snacks, loading: snacksLoading, error: snacksError, fetchSnacks } = useSnacks({
     location: selectedLocation,
     radius: searchRadius,
+    categoryId: selectedCategory,
+    search: searchQuery,
     autoFetch: true,
   });
 
@@ -39,6 +42,10 @@ export const Home: React.FC = () => {
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
+  };
+
+  const handleSearchChange = (search: string) => {
+    setSearchQuery(search);
   };
 
   if (locationLoading) {
@@ -88,6 +95,8 @@ export const Home: React.FC = () => {
         radius={searchRadius}
         selectedCategory={selectedCategory}
         viewMode={viewMode}
+        onSearchChange={handleSearchChange}
+        searchQuery={searchQuery}
       />
 
       {/* Main content */}
@@ -104,10 +113,10 @@ export const Home: React.FC = () => {
         ) : (
           <div className="content-view list-view">
             <SnackList
-              snacks={filteredSnacks}
+              snacks={snacks}
               loading={snacksLoading}
               error={snacksError}
-              onRetry={() => fetchSnacks(selectedLocation, searchRadius)}
+              onRetry={() => fetchSnacks(selectedLocation, searchRadius, selectedCategory, searchQuery)}
             />
           </div>
         )}

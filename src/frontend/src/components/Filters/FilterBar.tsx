@@ -6,24 +6,27 @@ import apiService from '../../services/api';
 interface FilterBarProps {
   onRadiusChange: (radius: number) => void;
   onCategoryChange: (categoryId: string) => void;
+  onSearchChange: (search: string) => void;
   onViewModeChange: (mode: 'map' | 'list') => void;
   currentLocation?: Location;
   radius: number;
   selectedCategory: string;
+  searchQuery: string;
   viewMode: 'map' | 'list';
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
   onRadiusChange,
   onCategoryChange,
+  onSearchChange,
   onViewModeChange,
   currentLocation,
   radius,
   selectedCategory,
+  searchQuery,
   viewMode,
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
@@ -41,8 +44,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement search functionality
-    console.log('Search:', searchQuery);
+    // Search is handled on keystroke via onSearchChange
   };
 
   return (
@@ -60,7 +62,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               type="text"
               placeholder="Search snacks..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => onSearchChange(e.target.value)}
               className="form-input search-input"
               aria-label="Search for snacks"
             />

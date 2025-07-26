@@ -27,6 +27,7 @@ public static class TestAuthHelper
                 new Claim("level", user.Level.ToString()),
                 new Claim("experience", user.ExperiencePoints.ToString())
             }),
+            NotBefore = DateTime.UtcNow,
             Expires = DateTime.UtcNow.AddHours(1),
             Issuer = TestIssuer,
             Audience = TestAudience,

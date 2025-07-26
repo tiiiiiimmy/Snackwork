@@ -14,6 +14,15 @@ import type {
   ApiError,
 } from '../types/api';
 
+// Interface for snacks query parameters
+interface SnacksQueryParams {
+  lat: number;
+  lng: number;
+  radius: number;
+  categoryId?: string;
+  search?: string;
+}
+
 // Use relative URLs in development (with Vite proxy) or full URL in production
 const API_BASE_URL = import.meta.env.DEV
   ? '' // Use relative URLs with Vite proxy in development
@@ -118,9 +127,17 @@ class ApiService {
   }
 
   // Snacks endpoints
-  async getSnacks(lat: number, lng: number, radius: number = 1000): Promise<Snack[]> {
+  async getSnacks(lat: number, lng: number, radius: number = 1000, categoryId?: string, search?: string): Promise<Snack[]> {
+    const params: SnacksQueryParams = { lat, lng, radius };
+    if (categoryId) {
+      params.categoryId = categoryId;
+    }
+    if (search && search.trim()) {
+      params.search = search.trim();
+    }
+
     const response = await this.api.get<Snack[]>('/snacks', {
-      params: { lat, lng, radius },
+      params,
     });
     return response.data;
   }

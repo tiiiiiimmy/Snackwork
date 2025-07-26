@@ -5,15 +5,17 @@ import apiService from '../services/api';
 interface UseSnacksProps {
   location?: Location;
   radius?: number;
+  categoryId?: string;
+  search?: string;
   autoFetch?: boolean;
 }
 
-export const useSnacks = ({ location, radius = 1000, autoFetch = true }: UseSnacksProps = {}) => {
+export const useSnacks = ({ location, radius = 1000, categoryId, search, autoFetch = true }: UseSnacksProps = {}) => {
   const [snacks, setSnacks] = useState<Snack[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSnacks = useCallback(async (loc?: Location, r?: number) => {
+  const fetchSnacks = useCallback(async (loc?: Location, r?: number, catId?: string, searchTerm?: string) => {
     if (!loc && !location) {
       setError('Location is required to fetch snacks');
       return;
@@ -21,6 +23,8 @@ export const useSnacks = ({ location, radius = 1000, autoFetch = true }: UseSnac
 
     const fetchLocation = loc || location!;
     const fetchRadius = r || radius;
+    const fetchCategoryId = catId !== undefined ? catId : categoryId;
+    const fetchSearch = searchTerm !== undefined ? searchTerm : search;
 
     setLoading(true);
     setError(null);
@@ -29,7 +33,9 @@ export const useSnacks = ({ location, radius = 1000, autoFetch = true }: UseSnac
       const fetchedSnacks = await apiService.getSnacks(
         fetchLocation.lat,
         fetchLocation.lng,
-        fetchRadius
+        fetchRadius,
+        fetchCategoryId,
+        fetchSearch
       );
       setSnacks(fetchedSnacks);
     } catch (err) {
@@ -38,19 +44,19 @@ export const useSnacks = ({ location, radius = 1000, autoFetch = true }: UseSnac
     } finally {
       setLoading(false);
     }
-  }, [location, radius]);
+  }, [location, radius, categoryId, search]);
 
   const refetch = () => {
     if (location) {
-      fetchSnacks(location, radius);
+      fetchSnacks(location, radius, categoryId, search);
     }
   };
 
   useEffect(() => {
     if (autoFetch && location) {
-      fetchSnacks(location, radius);
+      fetchSnacks(location, radius, categoryId, search);
     }
-  }, [fetchSnacks, location, radius, autoFetch]);
+  }, [fetchSnacks, location, radius, categoryId, search, autoFetch]);
 
   return {
     snacks,
