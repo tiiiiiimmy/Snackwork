@@ -36,7 +36,7 @@ global.google = {
     Point: vi.fn(),
     LatLng: vi.fn(),
   },
-} as any
+} as typeof google
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({

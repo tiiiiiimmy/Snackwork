@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 
 namespace SnackSpotAuckland.Api.Middleware;
 
@@ -12,11 +13,11 @@ public class RateLimitingMiddleware
     private readonly ConcurrentDictionary<string, RateLimitInfo> _clients;
     private readonly Timer _cleanupTimer;
 
-    public RateLimitingMiddleware(RequestDelegate next, ILogger<RateLimitingMiddleware> logger, RateLimitOptions options)
+    public RateLimitingMiddleware(RequestDelegate next, ILogger<RateLimitingMiddleware> logger, IOptions<RateLimitOptions> options)
     {
         _next = next;
         _logger = logger;
-        _options = options;
+        _options = options.Value;
         _clients = new ConcurrentDictionary<string, RateLimitInfo>();
 
         // Cleanup expired entries every minute

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
@@ -20,10 +21,9 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   user?: User | null
 }
 
-const AllTheProviders: React.FC<{ children: React.ReactNode; initialEntries?: string[]; user?: User | null }> = ({ 
-  children, 
-  initialEntries = ['/'],
-  user = null 
+const AllTheProviders: React.FC<{ children: React.ReactNode; user?: User | null }> = ({
+  children,
+  user = null
 }) => {
   return (
     <BrowserRouter>
@@ -38,11 +38,11 @@ const customRender = (
   ui: React.ReactElement,
   options: ExtendedRenderOptions = {}
 ) => {
-  const { initialEntries, user, ...renderOptions } = options
+  const { user, ...renderOptions } = options
 
   return render(ui, {
     wrapper: ({ children }) => (
-      <AllTheProviders initialEntries={initialEntries} user={user}>
+      <AllTheProviders user={user}>
         {children}
       </AllTheProviders>
     ),

@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { mockUser, mockSnacks, mockCategories, mockReviews } from './data'
 
-const API_BASE = 'http://localhost:5000/api/v1'
+const API_BASE = 'http://localhost:5011/api/v1'
 
 export const handlers = [
   // Auth endpoints
@@ -14,7 +14,7 @@ export const handlers = [
     })
   }),
 
-  http.post(`${API_BASE}/auth/login`, ({ request }) => {
+  http.post(`${API_BASE}/auth/login`, () => {
     return HttpResponse.json({
       user: mockUser,
       accessToken: 'mock-access-token',
@@ -45,11 +45,11 @@ export const handlers = [
     const lat = url.searchParams.get('lat')
     const lng = url.searchParams.get('lng')
     const radius = url.searchParams.get('radius')
-    
+
     if (!lat || !lng || !radius) {
       return HttpResponse.json({ message: 'Missing required parameters' }, { status: 400 })
     }
-    
+
     return HttpResponse.json(mockSnacks)
   }),
 

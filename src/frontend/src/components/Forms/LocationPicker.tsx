@@ -158,6 +158,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const handleConfirm = () => {
     if (selectedLocation) {
       onLocationSelected(selectedLocation, address);
+      announceToScreenReader('Location confirmed');
     }
   };
 
@@ -181,20 +182,26 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           if (geocoder) {
             reverseGeocode(newLocation, geocoder);
           }
+          announceToScreenReader('Current location found and selected');
         }
       },
       (error) => {
         console.error('Geolocation error:', error);
-        alert('Failed to get current location');
+        announceToScreenReader('Failed to get current location. Please select manually on the map.');
       }
     );
   };
 
   if (!window.google || !window.google.maps) {
     return (
-      <div className="location-picker-modal">
-        <div className="modal-unavailable">
-          <h3 className="unavailable-title">
+      <div 
+        className="location-picker-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="unavailable-title"
+      >
+        <div className="modal-unavailable" ref={modalRef}>
+          <h3 className="unavailable-title" id="unavailable-title">
             Map Unavailable
           </h3>
           <p className="unavailable-text">
@@ -203,6 +210,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           <button
             onClick={onClose}
             className="cancel-button unavailable-button"
+            aria-label="Close modal"
           >
             Close
           </button>
@@ -212,16 +220,22 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   }
 
   return (
-    <div className="location-picker-modal">
-      <div className="modal-content">
+    <div 
+      className="location-picker-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <div className="modal-content" ref={modalRef}>
         {/* Header */}
         <div className="modal-header">
-          <h3 className="modal-title">Choose Snack Location</h3>
+          <h3 className="modal-title" id="modal-title">Choose Snack Location</h3>
           <button
             onClick={onClose}
             className="close-button"
+            aria-label="Close location picker"
           >
-            <XMarkIcon />
+            <XMarkIcon aria-hidden="true" />
           </button>
         </div>
 
@@ -237,7 +251,13 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
               </div>
             </div>
           )}
-          <div ref={mapRef} className="map-container" />
+          <div 
+            ref={mapRef} 
+            className="map-container"
+            role="application"
+            aria-label="Interactive map for selecting snack location. Click or drag marker to set location."
+            data-testid="map-container"
+          />
 
           {/* Location Info */}
           {selectedLocation && (
@@ -258,6 +278,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           <button
             onClick={handleCurrentLocation}
             className="current-location-button"
+            aria-label="Use current device location"
           >
             Use Current Location
           </button>
@@ -271,6 +292,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
             onClick={handleConfirm}
             disabled={!selectedLocation}
             className="confirm-button"
+            aria-label={selectedLocation ? 'Confirm selected location' : 'Please select a location first'}
           >
             Confirm Location
           </button>

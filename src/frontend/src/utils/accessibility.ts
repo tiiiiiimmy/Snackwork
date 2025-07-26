@@ -222,7 +222,7 @@ export const validateFormAccessibility = (form: HTMLFormElement): string[] => {
   const inputs = form.querySelectorAll('input, textarea, select')
 
   inputs.forEach((input) => {
-    const element = input as HTMLElement
+    const element = input as HTMLInputElement
     const label = form.querySelector(`label[for="${element.id}"]`)
     const ariaLabel = element.getAttribute('aria-label')
     const ariaLabelledBy = element.getAttribute('aria-labelledby')

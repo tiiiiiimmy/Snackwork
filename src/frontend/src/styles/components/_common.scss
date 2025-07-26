@@ -123,3 +123,35 @@
         margin-right: $spacing-1;
     }
 }
+
+// Screen reader only content
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// Skip links for keyboard navigation
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: $primary-color;
+    color: $white;
+    padding: 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    z-index: 1000;
+    font-weight: 600;
+    transition: top 0.3s;
+
+    &:focus {
+        top: 6px;
+    }
+}

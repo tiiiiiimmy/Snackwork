@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+
 namespace SnackSpotAuckland.Api.Middleware;
 
 public class SecurityHeadersMiddleware
@@ -6,11 +8,11 @@ public class SecurityHeadersMiddleware
     private readonly ILogger<SecurityHeadersMiddleware> _logger;
     private readonly SecurityHeadersOptions _options;
 
-    public SecurityHeadersMiddleware(RequestDelegate next, ILogger<SecurityHeadersMiddleware> logger, SecurityHeadersOptions options)
+    public SecurityHeadersMiddleware(RequestDelegate next, ILogger<SecurityHeadersMiddleware> logger, IOptions<SecurityHeadersOptions> options)
     {
         _next = next;
         _logger = logger;
-        _options = options;
+        _options = options.Value;
     }
 
     public async Task InvokeAsync(HttpContext context)

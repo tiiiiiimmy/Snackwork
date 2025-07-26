@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User, RegisterRequest, LoginRequest } from '../types/api';
-import { AuthContext } from './AuthContext';
+import { AuthContext, type AuthContextType } from './AuthContext';
 import apiService from '../services/api';
 
 

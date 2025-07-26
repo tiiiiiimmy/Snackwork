@@ -72,7 +72,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     }
 
     setMap(newMap);
-  }, [isGoogleMapsLoaded]); // Removed problematic dependencies
+  }, [isGoogleMapsLoaded, center, map, onLocationChange]);
 
   // Update map center when center prop changes
   useEffect(() => {

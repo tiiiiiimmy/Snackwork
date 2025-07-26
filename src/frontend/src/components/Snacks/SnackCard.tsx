@@ -12,10 +12,11 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
+    const ratingText = `${rating.toFixed(1)} out of 5 stars, based on ${snack.reviewCount} reviews`;
 
     return (
-      <div className="snack-rating">
-        <div className="rating-stars">
+      <div className="snack-rating" aria-label={ratingText}>
+        <div className="rating-stars" aria-hidden="true">
           {[...Array(5)].map((_, index) => {
             if (index < fullStars) {
               return (
@@ -35,7 +36,7 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
             }
           })}
         </div>
-        <span className="rating-value">
+        <span className="rating-value" aria-hidden="true">
           {rating.toFixed(1)} ({snack.reviewCount})
         </span>
       </div>
@@ -43,18 +44,23 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
   };
 
   return (
-    <Link to={`/snacks/${snack.id}`} className="snack-card-link">
-      <div className="snack-card">
+    <Link 
+      to={`/snacks/${snack.id}`} 
+      className="snack-card-link"
+      aria-label={`View details for ${snack.name} - ${snack.averageRating.toFixed(1)} stars, $${snack.price.toFixed(2)}`}
+    >
+      <div className="snack-card" data-testid="snack-card">
         {/* Image */}
         {snack.imageUrl ? (
           <img
             src={snack.imageUrl}
-            alt={snack.name}
+            alt={`Photo of ${snack.name}`}
             className="snack-image"
+            loading="lazy"
           />
         ) : (
-          <div className="snack-image-placeholder">
-            <span>No image available</span>
+          <div className="snack-image-placeholder" aria-label="No image available">
+            <span aria-hidden="true">No image available</span>
           </div>
         )}
 
@@ -66,7 +72,7 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
             </h3>
 
             <div className="snack-location">
-              <MapPinIcon />
+              <MapPinIcon aria-hidden="true" />
               <span>{snack.location}</span>
             </div>
           </div>
@@ -86,7 +92,7 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
 
           {snack.category && (
             <div className="snack-category">
-              <span className="category-badge">
+              <span className="category-badge" data-testid="category-badge">
                 {snack.category.name}
               </span>
             </div>

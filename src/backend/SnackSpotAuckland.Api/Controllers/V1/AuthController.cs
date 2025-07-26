@@ -30,17 +30,35 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<object>> Register([FromBody] RegisterDto registerDto)
     {
+        _logger.LogInformation("Registration attempt started for email: {Email}, username: {Username}", 
+            registerDto?.Email ?? "null", registerDto?.Username ?? "null");
+        
         try
         {
+            if (registerDto == null)
+            {
+                _logger.LogWarning("Registration failed: registerDto is null");
+                return BadRequest(new { message = "Invalid request data" });
+            }
+
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Registration failed: ModelState invalid. Errors: {@Errors}", 
+                    ModelState.Where(x => x.Value.Errors.Count > 0)
+                    .ToDictionary(k => k.Key, v => v.Value.Errors.Select(e => e.ErrorMessage)));
                 return BadRequest(ModelState);
             }
 
+            _logger.LogInformation("ModelState is valid, proceeding with registration");
+
+            _logger.LogInformation("Calling AuthService.RegisterAsync");
             var result = await _authService.RegisterAsync(registerDto);
+            _logger.LogInformation("AuthService.RegisterAsync completed. Success: {Success}, Message: {Message}", 
+                result.Success, result.Message);
 
             if (!result.Success)
             {
+                _logger.LogWarning("Registration failed in AuthService: {Message}", result.Message);
                 return BadRequest(new { message = result.Message });
             }
 

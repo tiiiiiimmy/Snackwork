@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import axios from 'axios'
 import apiService from '../api'
 import { mockUser, mockSnacks, mockCategories } from '../../test/mocks/data'
+import { AxiosInstance, AxiosError } from 'axios'
 
 // Mock axios
 vi.mock('axios')
@@ -11,7 +12,7 @@ describe('API Service', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Reset axios create mock
-    mockedAxios.create.mockReturnValue(mockedAxios as any)
+    mockedAxios.create.mockReturnValue(mockedAxios as unknown as AxiosInstance)
   })
 
   describe('Authentication', () => {
@@ -168,7 +169,7 @@ describe('API Service', () => {
         }
       }
 
-      const result = apiService.handleApiError(axiosError as any)
+      const result = apiService.handleApiError(axiosError as AxiosError)
 
       expect(result).toEqual({
         message: 'Validation failed',
@@ -183,7 +184,7 @@ describe('API Service', () => {
         response: undefined
       }
 
-      const result = apiService.handleApiError(networkError as any)
+      const result = apiService.handleApiError(networkError as AxiosError)
 
       expect(result).toEqual({
         message: 'Network error - please check your connection',
@@ -196,7 +197,7 @@ describe('API Service', () => {
         message: 'Something went wrong'
       }
 
-      const result = apiService.handleApiError(unknownError as any)
+      const result = apiService.handleApiError(unknownError as Error)
 
       expect(result).toEqual({
         message: 'Something went wrong',

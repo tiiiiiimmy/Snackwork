@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace SnackSpotAuckland.Api.Middleware;
 
@@ -11,11 +12,11 @@ public class InputValidationMiddleware
     private readonly ILogger<InputValidationMiddleware> _logger;
     private readonly InputValidationOptions _options;
 
-    public InputValidationMiddleware(RequestDelegate next, ILogger<InputValidationMiddleware> logger, InputValidationOptions options)
+    public InputValidationMiddleware(RequestDelegate next, ILogger<InputValidationMiddleware> logger, IOptions<InputValidationOptions> options)
     {
         _next = next;
         _logger = logger;
-        _options = options;
+        _options = options.Value;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -361,7 +362,13 @@ public class InputValidationMiddleware
         {
             "Authorization", "Content-Type", "Content-Length", "User-Agent", "Accept", "Accept-Encoding",
             "Accept-Language", "Host", "Origin", "Referer", "Connection", "Cache-Control", "Cookie",
-            "X-Requested-With", "X-Forwarded-For", "X-Real-IP", "X-Forwarded-Proto"
+            "X-Requested-With", "X-Forwarded-For", "X-Real-IP", "X-Forwarded-Proto",
+            // Browser security headers
+            "Sec-CH-UA", "Sec-CH-UA-Mobile", "Sec-CH-UA-Platform", "Sec-Fetch-Site", "Sec-Fetch-Mode", 
+            "Sec-Fetch-User", "Sec-Fetch-Dest", "Upgrade-Insecure-Requests",
+            // Additional standard headers
+            "DNT", "Content-Encoding", "Transfer-Encoding", "TE", "Pragma", "Expires",
+            "Last-Modified", "If-Modified-Since", "If-None-Match", "ETag", "Vary"
         };
 
         return systemHeaders.Contains(headerName);

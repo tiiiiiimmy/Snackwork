@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
 
 namespace SnackSpotAuckland.Api.Middleware;
 
@@ -11,11 +12,11 @@ public class RequestLoggingMiddleware
     private readonly ILogger<RequestLoggingMiddleware> _logger;
     private readonly RequestLoggingOptions _options;
 
-    public RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger, RequestLoggingOptions options)
+    public RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger, IOptions<RequestLoggingOptions> options)
     {
         _next = next;
         _logger = logger;
-        _options = options;
+        _options = options.Value;
     }
 
     public async Task InvokeAsync(HttpContext context)

@@ -9,8 +9,6 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'md',
   className = ''
 }) => {
-  const sizeClass = `size-${size}`;
-
   return (
     <div
       data-testid="loading-spinner"
