@@ -1,18 +1,36 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import axios from 'axios'
+import type { AxiosInstance } from 'axios'
+
+// Create mock functions with hoisting
+const mockGet = vi.hoisted(() => vi.fn())
+const mockPost = vi.hoisted(() => vi.fn())
+const mockPut = vi.hoisted(() => vi.fn())
+const mockDelete = vi.hoisted(() => vi.fn())
+const mockInterceptors = vi.hoisted(() => ({
+  request: { use: vi.fn() },
+  response: { use: vi.fn() }
+}))
+
+// Mock axios with hoisted functions
+vi.mock('axios', () => ({
+  default: {
+    create: vi.fn(() => ({
+      get: mockGet,
+      post: mockPost,
+      put: mockPut,
+      delete: mockDelete,
+      interceptors: mockInterceptors
+    } as unknown as AxiosInstance))
+  }
+}))
+
+// Import after mocking
 import apiService from '../api'
 import { mockUser, mockSnacks, mockCategories } from '../../test/mocks/data'
-import { AxiosInstance, AxiosError } from 'axios'
-
-// Mock axios
-vi.mock('axios')
-const mockedAxios = vi.mocked(axios)
 
 describe('API Service', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Reset axios create mock
-    mockedAxios.create.mockReturnValue(mockedAxios as unknown as AxiosInstance)
   })
 
   describe('Authentication', () => {
@@ -25,11 +43,11 @@ describe('API Service', () => {
         expiresAt: '2024-12-31T23:59:59Z'
       }
 
-      mockedAxios.post.mockResolvedValueOnce({ data: responseData })
+      mockPost.mockResolvedValueOnce({ data: responseData })
 
       const result = await apiService.login(loginData)
 
-      expect(mockedAxios.post).toHaveBeenCalledWith('/auth/login', loginData)
+      expect(mockPost).toHaveBeenCalledWith('/auth/login', loginData)
       expect(result).toEqual(responseData)
     })
 
@@ -42,20 +60,20 @@ describe('API Service', () => {
         expiresAt: '2024-12-31T23:59:59Z'
       }
 
-      mockedAxios.post.mockResolvedValueOnce({ data: responseData })
+      mockPost.mockResolvedValueOnce({ data: responseData })
 
       const result = await apiService.register(registerData)
 
-      expect(mockedAxios.post).toHaveBeenCalledWith('/auth/register', registerData)
+      expect(mockPost).toHaveBeenCalledWith('/auth/register', registerData)
       expect(result).toEqual(responseData)
     })
 
     it('should logout successfully', async () => {
-      mockedAxios.post.mockResolvedValueOnce({ data: { message: 'Logged out' } })
+      mockPost.mockResolvedValueOnce({ data: { message: 'Logged out' } })
 
       await apiService.logout()
 
-      expect(mockedAxios.post).toHaveBeenCalledWith('/auth/logout')
+      expect(mockPost).toHaveBeenCalledWith('/auth/logout')
     })
 
     it('should refresh token successfully', async () => {
@@ -65,20 +83,20 @@ describe('API Service', () => {
         expiresAt: '2024-12-31T23:59:59Z'
       }
 
-      mockedAxios.post.mockResolvedValueOnce({ data: responseData })
+      mockPost.mockResolvedValueOnce({ data: responseData })
 
       const result = await apiService.refreshToken()
 
-      expect(mockedAxios.post).toHaveBeenCalledWith('/auth/refresh')
+      expect(mockPost).toHaveBeenCalledWith('/auth/refresh')
       expect(result).toEqual(responseData)
     })
 
     it('should get user profile', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: mockUser })
+      mockGet.mockResolvedValueOnce({ data: mockUser })
 
       const result = await apiService.getProfile()
 
-      expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile')
+      expect(mockGet).toHaveBeenCalledWith('/auth/profile')
       expect(result).toEqual(mockUser)
     })
   })
@@ -86,22 +104,22 @@ describe('API Service', () => {
   describe('Snacks', () => {
     it('should get nearby snacks', async () => {
       const params = { lat: -36.8485, lng: 174.7633, radius: 1000 }
-      mockedAxios.get.mockResolvedValueOnce({ data: mockSnacks })
+      mockGet.mockResolvedValueOnce({ data: mockSnacks })
 
       const result = await apiService.getNearbySnacks(params.lat, params.lng, params.radius)
 
-      expect(mockedAxios.get).toHaveBeenCalledWith('/snacks', { params })
+      expect(mockGet).toHaveBeenCalledWith('/snacks', { params })
       expect(result).toEqual(mockSnacks)
     })
 
     it('should get snack by id', async () => {
       const snackId = 'snack-1'
       const snack = mockSnacks[0]
-      mockedAxios.get.mockResolvedValueOnce({ data: snack })
+      mockGet.mockResolvedValueOnce({ data: snack })
 
       const result = await apiService.getSnack(snackId)
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(`/snacks/${snackId}`)
+      expect(mockGet).toHaveBeenCalledWith(`/snacks/${snackId}`)
       expect(result).toEqual(snack)
     })
 
@@ -118,11 +136,11 @@ describe('API Service', () => {
         shopAddress: 'Address'
       }
       const createdSnack = { ...mockSnacks[0], ...snackData }
-      mockedAxios.post.mockResolvedValueOnce({ data: createdSnack })
+      mockPost.mockResolvedValueOnce({ data: createdSnack })
 
       const result = await apiService.createSnack(snackData)
 
-      expect(mockedAxios.post).toHaveBeenCalledWith('/snacks', snackData)
+      expect(mockPost).toHaveBeenCalledWith('/snacks', snackData)
       expect(result).toEqual(createdSnack)
     })
 
@@ -130,31 +148,31 @@ describe('API Service', () => {
       const snackId = 'snack-1'
       const updateData = { name: 'Updated Snack' }
       const updatedSnack = { ...mockSnacks[0], ...updateData }
-      mockedAxios.put.mockResolvedValueOnce({ data: updatedSnack })
+      mockPut.mockResolvedValueOnce({ data: updatedSnack })
 
       const result = await apiService.updateSnack(snackId, updateData)
 
-      expect(mockedAxios.put).toHaveBeenCalledWith(`/snacks/${snackId}`, updateData)
+      expect(mockPut).toHaveBeenCalledWith(`/snacks/${snackId}`, updateData)
       expect(result).toEqual(updatedSnack)
     })
 
     it('should delete snack', async () => {
       const snackId = 'snack-1'
-      mockedAxios.delete.mockResolvedValueOnce({ data: null })
+      mockDelete.mockResolvedValueOnce({ data: null })
 
       await apiService.deleteSnack(snackId)
 
-      expect(mockedAxios.delete).toHaveBeenCalledWith(`/snacks/${snackId}`)
+      expect(mockDelete).toHaveBeenCalledWith(`/snacks/${snackId}`)
     })
   })
 
   describe('Categories', () => {
     it('should get all categories', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: mockCategories })
+      mockGet.mockResolvedValueOnce({ data: mockCategories })
 
       const result = await apiService.getCategories()
 
-      expect(mockedAxios.get).toHaveBeenCalledWith('/categories')
+      expect(mockGet).toHaveBeenCalledWith('/categories')
       expect(result).toEqual(mockCategories)
     })
   })
@@ -211,11 +229,11 @@ describe('API Service', () => {
   describe('Health Check', () => {
     it('should check health status', async () => {
       const healthData = { status: 'healthy', timestamp: '2024-01-01T00:00:00Z' }
-      mockedAxios.get.mockResolvedValueOnce({ data: healthData })
+      mockGet.mockResolvedValueOnce({ data: healthData })
 
       const result = await apiService.healthCheck()
 
-      expect(mockedAxios.get).toHaveBeenCalledWith('/health')
+      expect(mockGet).toHaveBeenCalledWith('/health')
       expect(result).toEqual(healthData)
     })
   })

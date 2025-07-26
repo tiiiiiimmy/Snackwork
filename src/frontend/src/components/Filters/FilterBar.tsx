@@ -49,15 +49,20 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     <div className="filter-bar">
       <div className="filter-content">
         {/* Search */}
-        <form onSubmit={handleSearch} className="search-form">
+        <form onSubmit={handleSearch} className="search-form" role="search">
           <div className="search-input-container">
-            <MagnifyingGlassIcon className="search-icon" />
+            <MagnifyingGlassIcon className="search-icon" aria-hidden="true" />
+            <label htmlFor="snack-search" className="sr-only">
+              Search for snacks
+            </label>
             <input
+              id="snack-search"
               type="text"
               placeholder="Search snacks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="form-input search-input"
+              aria-label="Search for snacks"
             />
           </div>
         </form>
@@ -67,26 +72,33 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`toggle-button ${showFilters ? 'active' : ''}`}
+            aria-expanded={showFilters}
+            aria-controls="expanded-filters"
+            aria-label={`${showFilters ? 'Hide' : 'Show'} filter options`}
           >
-            <AdjustmentsHorizontalIcon />
+            <AdjustmentsHorizontalIcon aria-hidden="true" />
             <span className={showFilters ? 'show' : 'hide'}>Filters</span>
           </button>
         </div>
 
         {/* View mode toggle */}
-        <div className="view-toggle">
+        <div className="view-toggle" role="group" aria-label="View mode selection">
           <button
             onClick={() => onViewModeChange('map')}
             className={`toggle-button ${viewMode === 'map' ? 'active' : ''}`}
+            aria-pressed={viewMode === 'map'}
+            aria-label="Switch to map view"
           >
-            <MapIcon />
+            <MapIcon aria-hidden="true" />
             <span>Map</span>
           </button>
           <button
             onClick={() => onViewModeChange('list')}
             className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
+            aria-pressed={viewMode === 'list'}
+            aria-label="Switch to list view"
           >
-            <ListBulletIcon />
+            <ListBulletIcon aria-hidden="true" />
             <span>List</span>
           </button>
         </div>
@@ -94,17 +106,19 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
       {/* Expanded filters */}
       {showFilters && (
-        <div className="expanded-filters">
+        <div id="expanded-filters" className="expanded-filters">
           <div className="filters-grid">
             {/* Category filter */}
             <div className="filter-group">
-              <label className="filter-label">
+              <label htmlFor="category-select" className="filter-label">
                 Category
               </label>
               <select
+                id="category-select"
                 value={selectedCategory}
                 onChange={(e) => onCategoryChange(e.target.value)}
                 className="filter-select"
+                aria-label="Select snack category"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -117,10 +131,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
             {/* Radius filter */}
             <div className="filter-group">
-              <label className="filter-label">
+              <label htmlFor="radius-range" className="filter-label">
                 Radius: {radius}m
               </label>
               <input
+                id="radius-range"
                 type="range"
                 min="500"
                 max="5000"
@@ -128,8 +143,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 value={radius}
                 onChange={(e) => onRadiusChange(Number(e.target.value))}
                 className="filter-input range-input"
+                aria-label={`Search radius: ${radius} meters`}
+                aria-valuemin={500}
+                aria-valuemax={5000}
+                aria-valuenow={radius}
+                aria-valuetext={`${radius} meters`}
               />
-              <div className="range-labels">
+              <div className="range-labels" aria-hidden="true">
                 <span>500m</span>
                 <span>5km</span>
               </div>

@@ -21,13 +21,10 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   user?: User | null
 }
 
-const AllTheProviders: React.FC<{ children: React.ReactNode; user?: User | null }> = ({
-  children,
-  user = null
-}) => {
+const AllTheProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <BrowserRouter>
-      <AuthProvider initialUser={user}>
+      <AuthProvider>
         {children}
       </AuthProvider>
     </BrowserRouter>
@@ -42,7 +39,7 @@ const customRender = (
 
   return render(ui, {
     wrapper: ({ children }) => (
-      <AllTheProviders user={user}>
+      <AllTheProviders>
         {children}
       </AllTheProviders>
     ),

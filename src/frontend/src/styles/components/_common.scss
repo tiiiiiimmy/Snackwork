@@ -155,3 +155,160 @@
         top: 6px;
     }
 }
+
+// WCAG 2.1 AA Compliance Enhancements
+
+// Focus indicators for all interactive elements
+button, 
+a, 
+input, 
+textarea, 
+select, 
+[tabindex]:not([tabindex="-1"]),
+[role="button"],
+[role="link"],
+[role="tab"],
+[role="menuitem"] {
+    &:focus-visible {
+        outline: 2px solid $primary-color;
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+    button,
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .status-badge {
+        border-width: 2px;
+    }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+// Touch target sizing (minimum 44px for WCAG AA)
+.touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// Mobile touch targets
+@media (max-width: 768px) {
+    button,
+    .btn,
+    a,
+    input[type="checkbox"],
+    input[type="radio"],
+    [role="button"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+// Color contrast validation styles
+.contrast-check {
+    // Ensure text has sufficient contrast
+    &.low-contrast {
+        background-color: #ffeb3b;
+        color: #000;
+        border: 2px solid #ff5722;
+    }
+}
+
+// Form accessibility enhancements
+.form-field {
+    &.has-error {
+        input,
+        textarea,
+        select {
+            border-color: $danger-color;
+            background-color: rgba($danger-color, 0.05);
+            
+            &:focus {
+                outline-color: $danger-color;
+            }
+        }
+    }
+    
+    .field-error {
+        color: $danger-color;
+        font-size: $font-size-sm;
+        margin-top: $spacing-1;
+        display: flex;
+        align-items: center;
+        
+        &::before {
+            content: "⚠";
+            margin-right: $spacing-1;
+            font-weight: bold;
+        }
+    }
+    
+    .field-help {
+        color: $gray-600;
+        font-size: $font-size-sm;
+        margin-top: $spacing-1;
+    }
+}
+
+// Required field indicators
+.required {
+    &::after {
+        content: " *";
+        color: $danger-color;
+        font-weight: bold;
+    }
+}
+
+// Loading states with proper ARIA support
+.loading-state {
+    position: relative;
+    
+    &[aria-busy="true"] {
+        pointer-events: none;
+        opacity: 0.7;
+        
+        &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+    }
+}
+
+// Landmark regions styling
+[role="main"],
+[role="navigation"],
+[role="banner"],
+[role="contentinfo"],
+[role="complementary"] {
+    &:focus {
+        outline: 2px solid $primary-color;
+        outline-offset: -2px;
+    }
+}

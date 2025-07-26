@@ -2,16 +2,72 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Reflection;
+using Microsoft.OpenApi.Models;
 using SnackSpotAuckland.Api.Data;
 using SnackSpotAuckland.Api.Services;
 using SnackSpotAuckland.Api.Middleware;
+using SnackSpotAuckland.Api.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new()
+    {
+        Title = "SnackSpot Auckland API",
+        Version = "v1",
+        Description = "A gamified, community-driven API for discovering and sharing snacks in Auckland, New Zealand",
+        Contact = new()
+        {
+            Name = "SnackSpot Auckland Team",
+            Email = "team@snackspot.nz"
+        },
+        License = new()
+        {
+            Name = "MIT License",
+            Url = new Uri("https://opensource.org/licenses/MIT")
+        }
+    });
+
+    // Add JWT Authentication to Swagger
+    options.AddSecurityDefinition("Bearer", new()
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Enter your JWT token in the format: your-token-here"
+    });
+
+    options.AddSecurityRequirement(new()
+    {
+        {
+            new()
+            {
+                Reference = new()
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+    // Include XML comments for better documentation
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+
+    // Add operation filters for better documentation
+    options.OperationFilter<SwaggerOperationFilter>();
+});
 
 // Register services
 builder.Services.AddScoped<IAuthService, AuthService>();

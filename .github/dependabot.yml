@@ -1,55 +1,55 @@
-# version: 2
-# updates:
-#   # Enable version updates for npm (frontend)
-#   - package-ecosystem: "npm"
-#     directory: "/src/frontend"
-#     schedule:
-#       interval: "weekly"
-#       day: "monday"
-#       time: "02:00"
-#     open-pull-requests-limit: 10
-#     reviewers:
-#       - "snackspot-team"
-#     commit-message:
-#       prefix: "feat"
-#       include: "scope"
-#     labels:
-#       - "dependencies"
-#       - "frontend"
-#     ignore:
-#       - dependency-name: "*"
-#         update-types: ["version-update:semver-major"]
+version: 2
+updates:
+  # Enable version updates for npm (frontend)
+  - package-ecosystem: "npm"
+    directory: "/src/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "02:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "snackspot-team"
+    commit-message:
+      prefix: "feat"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "frontend"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
-#   # Enable version updates for NuGet (backend)
-#   - package-ecosystem: "nuget"
-#     directory: "/src/backend/SnackSpotAuckland.Api"
-#     schedule:
-#       interval: "weekly"
-#       day: "monday"
-#       time: "02:00"
-#     open-pull-requests-limit: 10
-#     reviewers:
-#       - "snackspot-team"
-#     commit-message:
-#       prefix: "feat"
-#       include: "scope"
-#     labels:
-#       - "dependencies"
-#       - "backend"
-#     ignore:
-#       - dependency-name: "*"
-#         update-types: ["version-update:semver-major"]
+  # Enable version updates for NuGet (backend)
+  - package-ecosystem: "nuget"
+    directory: "/src/backend/SnackSpotAuckland.Api"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "02:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "snackspot-team"
+    commit-message:
+      prefix: "feat"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "backend"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
-#   # Monitor GitHub Actions
-#   - package-ecosystem: "github-actions"
-#     directory: "/"
-#     schedule:
-#       interval: "weekly"
-#       day: "monday"
-#       time: "02:00"
-#     commit-message:
-#       prefix: "ci"
-#       include: "scope"
-#     labels:
-#       - "dependencies"
-#       - "github-actions"
+  # Monitor GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "02:00"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
