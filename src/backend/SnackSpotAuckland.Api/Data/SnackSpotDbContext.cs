@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SnackSpotAuckland.Api.Models;
-using NetTopologySuite;
 
 namespace SnackSpotAuckland.Api.Data;
 

@@ -57,7 +57,7 @@ public class UsersController : ControllerBase
                 user.Username,
                 user.Level,
                 user.ExperiencePoints,
-                Location = user.Location != null ? new { lat = user.Location.Y, lng = user.Location.X } : null,
+                Location = user.Latitude.HasValue && user.Longitude.HasValue ? new { lat = user.Latitude.Value, lng = user.Longitude.Value } : null,
                 user.InstagramHandle,
                 user.Bio,
                 user.AvatarEmoji,

@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using NetTopologySuite.Geometries;
 
 namespace SnackSpotAuckland.Api.Models;
 
@@ -28,8 +27,11 @@ public class User
     [Range(0, int.MaxValue)]
     public int ExperiencePoints { get; set; } = 0;
 
-    [Column(TypeName = "geometry (point, 4326)")]
-    public Point? Location { get; set; }
+    [Column(TypeName = "decimal(9,6)")]
+    public decimal? Latitude { get; set; }
+
+    [Column(TypeName = "decimal(9,6)")]
+    public decimal? Longitude { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

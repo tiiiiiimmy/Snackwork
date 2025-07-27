@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SnackSpotAuckland.Api.Data;
 
@@ -13,8 +12,8 @@ using SnackSpotAuckland.Api.Data;
 namespace SnackSpotAuckland.Api.Migrations
 {
     [DbContext(typeof(SnackSpotDbContext))]
-    [Migration("20250707181110_FixCategorySeedData")]
-    partial class FixCategorySeedData
+    [Migration("20250727092942_InitialAzureMigration")]
+    partial class InitialAzureMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,8 +23,51 @@ namespace SnackSpotAuckland.Api.Migrations
                 .HasAnnotation("ProductVersion", "9.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("SnackSpotAuckland.Api.Models.AuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Entity")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("OldValue")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime>("Timestamp")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Timestamp");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Entity", "EntityId");
+
+                    b.ToTable("AuditLogs");
+                });
 
             modelBuilder.Entity("SnackSpotAuckland.Api.Models.Category", b =>
                 {
@@ -41,6 +83,9 @@ namespace SnackSpotAuckland.Api.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -65,6 +110,7 @@ namespace SnackSpotAuckland.Api.Migrations
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Cookies, chocolates, and other sweet treats",
+                            IsDeleted = false,
                             Name = "Sweet Snacks",
                             UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -73,6 +119,7 @@ namespace SnackSpotAuckland.Api.Migrations
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Chips, crackers, and salty snacks",
+                            IsDeleted = false,
                             Name = "Savory Snacks",
                             UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -81,6 +128,7 @@ namespace SnackSpotAuckland.Api.Migrations
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Nuts, fruits, and nutritious options",
+                            IsDeleted = false,
                             Name = "Healthy Snacks",
                             UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -89,6 +137,7 @@ namespace SnackSpotAuckland.Api.Migrations
                             Id = new Guid("44444444-4444-4444-4444-444444444444"),
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Beverages and liquid refreshments",
+                            IsDeleted = false,
                             Name = "Drinks",
                             UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -97,6 +146,7 @@ namespace SnackSpotAuckland.Api.Migrations
                             Id = new Guid("55555555-5555-5555-5555-555555555555"),
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Plant-based snack options",
+                            IsDeleted = false,
                             Name = "Vegan Snacks",
                             UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -216,26 +266,19 @@ namespace SnackSpotAuckland.Api.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("bytea");
 
-                    b.Property<Point>("Location")
-                        .IsRequired()
-                        .HasColumnType("geography (point)");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("ShopAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("ShopName")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("TotalRatings")
                         .HasColumnType("integer");
@@ -247,13 +290,52 @@ namespace SnackSpotAuckland.Api.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("Location");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Location"), "GIST");
+                    b.HasIndex("StoreId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Snacks");
+                });
+
+            modelBuilder.Entity("SnackSpotAuckland.Api.Models.Store", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("Name", "Latitude", "Longitude");
+
+                    b.ToTable("Stores");
                 });
 
             modelBuilder.Entity("SnackSpotAuckland.Api.Models.User", b =>
@@ -261,6 +343,15 @@ namespace SnackSpotAuckland.Api.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AvatarEmoji")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -275,11 +366,18 @@ namespace SnackSpotAuckland.Api.Migrations
                     b.Property<int>("ExperiencePoints")
                         .HasColumnType("integer");
 
+                    b.Property<string>("InstagramHandle")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(9,6)");
+
                     b.Property<int>("Level")
                         .HasColumnType("integer");
 
-                    b.Property<Point>("Location")
-                        .HasColumnType("geography (point)");
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(9,6)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -305,6 +403,17 @@ namespace SnackSpotAuckland.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("SnackSpotAuckland.Api.Models.AuditLog", b =>
+                {
+                    b.HasOne("SnackSpotAuckland.Api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SnackSpotAuckland.Api.Models.RefreshToken", b =>
@@ -345,6 +454,12 @@ namespace SnackSpotAuckland.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SnackSpotAuckland.Api.Models.Store", "Store")
+                        .WithMany("Snacks")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SnackSpotAuckland.Api.Models.User", "User")
                         .WithMany("Snacks")
                         .HasForeignKey("UserId")
@@ -353,7 +468,20 @@ namespace SnackSpotAuckland.Api.Migrations
 
                     b.Navigation("Category");
 
+                    b.Navigation("Store");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SnackSpotAuckland.Api.Models.Store", b =>
+                {
+                    b.HasOne("SnackSpotAuckland.Api.Models.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("SnackSpotAuckland.Api.Models.Category", b =>
@@ -364,6 +492,11 @@ namespace SnackSpotAuckland.Api.Migrations
             modelBuilder.Entity("SnackSpotAuckland.Api.Models.Snack", b =>
                 {
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("SnackSpotAuckland.Api.Models.Store", b =>
+                {
+                    b.Navigation("Snacks");
                 });
 
             modelBuilder.Entity("SnackSpotAuckland.Api.Models.User", b =>

@@ -112,12 +112,9 @@ builder.Services.Configure<RequestLoggingOptions>(options =>
     options.MaxLoggedBodyLength = 1000;
 });
 
-// Configure Entity Framework with PostgreSQL and PostGIS
+// Configure Entity Framework with PostgreSQL
 builder.Services.AddDbContext<SnackSpotDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        npgsqlOptions => npgsqlOptions.UseNetTopologySuite()
-    )
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 // Configure JWT Authentication

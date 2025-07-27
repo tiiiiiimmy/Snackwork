@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SnackSpotAuckland.Api.Data;
 
@@ -21,7 +20,6 @@ namespace SnackSpotAuckland.Api.Migrations
                 .HasAnnotation("ProductVersion", "9.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("SnackSpotAuckland.Api.Models.AuditLog", b =>
@@ -369,11 +367,14 @@ namespace SnackSpotAuckland.Api.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(9,6)");
+
                     b.Property<int>("Level")
                         .HasColumnType("integer");
 
-                    b.Property<Point>("Location")
-                        .HasColumnType("geometry (point, 4326)");
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(9,6)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
