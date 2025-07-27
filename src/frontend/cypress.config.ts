@@ -13,7 +13,7 @@ export default defineConfig({
     requestTimeout: 10000,
     responseTimeout: 10000,
     env: {
-      apiUrl: 'http://localhost:5000/api/v1'
+      apiUrl: 'https://snackspot-auckland-api.azurewebsites.net/api/v1'
     },
     setupNodeEvents() {
       // implement node event listeners here

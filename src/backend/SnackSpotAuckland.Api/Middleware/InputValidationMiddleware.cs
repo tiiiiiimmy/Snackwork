@@ -369,7 +369,9 @@ public class InputValidationMiddleware
             // Azure App Service headers
             "X-ARR-SSL", "X-ARR-LOG-ID", "X-Site-Deployment-Id", "X-Original-URL", "X-Forwarded-Host",
             "X-Azure-FDID", "X-Azure-RequestId", "X-MS-CLIENT-PRINCIPAL", "X-MS-CLIENT-PRINCIPAL-NAME",
-            "X-MS-CLIENT-PRINCIPAL-ID", "X-MS-CLIENT-PRINCIPAL-IDP"
+            "X-MS-CLIENT-PRINCIPAL-ID", "X-MS-CLIENT-PRINCIPAL-IDP", "X-WAWS-Unencoded-URL",
+            // Additional Azure headers that may be present
+            "X-AppService-Proto", "X-Forwarded-TlsVersion", "X-Site-Slot-Name", "X-WAWS-Handler"
         };
 
         return systemHeaders.Contains(headerName);

@@ -34,10 +34,8 @@ interface StoresQueryParams {
   search?: string;
 }
 
-// Use relative URLs in development (with Vite proxy) or full URL in production
-const API_BASE_URL = import.meta.env.DEV
-  ? '' // Use relative URLs with Vite proxy in development
-  : (import.meta.env.VITE_API_URL || 'http://localhost:5011');
+// Always use Azure API directly - no proxy needed
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://snackspot-auckland-api.azurewebsites.net';
 
 class ApiService {
   private api: AxiosInstance;

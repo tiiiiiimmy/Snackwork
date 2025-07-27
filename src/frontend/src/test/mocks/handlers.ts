@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { mockUser, mockSnacks, mockCategories, mockReviews } from './data'
 
-const API_BASE = 'http://localhost:5011/api/v1'
+const API_BASE = 'https://snackspot-auckland-api.azurewebsites.net/api/v1'
 
 export const handlers = [
   // Auth endpoints

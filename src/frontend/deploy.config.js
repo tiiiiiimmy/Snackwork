@@ -8,7 +8,7 @@ export const deployConfig = {
   environments: {
     development: {
       name: 'Development',
-      apiUrl: 'http://localhost:5011/api/v1',
+      apiUrl: 'https://snackspot-auckland-api.azurewebsites.net/api/v1',
       baseUrl: 'http://localhost:5173',
       enableDebug: true,
       enablePerformanceMonitoring: true,
@@ -16,7 +16,7 @@ export const deployConfig = {
     },
     staging: {
       name: 'Staging',
-      apiUrl: 'https://api-staging.snackspot.nz/api/v1',
+      apiUrl: 'https://snackspot-auckland-api.azurewebsites.net/api/v1',
       baseUrl: 'https://staging.snackspot.nz',
       enableDebug: false,
       enablePerformanceMonitoring: true,
@@ -24,7 +24,7 @@ export const deployConfig = {
     },
     production: {
       name: 'Production',
-      apiUrl: 'https://api.snackspot.nz/api/v1',
+      apiUrl: 'https://snackspot-auckland-api.azurewebsites.net/api/v1',
       baseUrl: 'https://snackspot.nz',
       enableDebug: false,
       enablePerformanceMonitoring: true,
@@ -39,7 +39,7 @@ export const deployConfig = {
     sourcemap: true,
     minify: true,
     target: 'es2015',
-    
+
     // Performance optimizations
     chunkSizeWarningLimit: 500,
     rollupOptions: {
@@ -63,7 +63,7 @@ export const deployConfig = {
       fcp: 1800,      // First Contentful Paint (ms)
       ttfb: 800       // Time to First Byte (ms)
     },
-    
+
     errorReporting: {
       enabled: true,
       maxErrors: 50,
@@ -73,7 +73,7 @@ export const deployConfig = {
         /ResizeObserver loop limit exceeded/
       ]
     },
-    
+
     healthChecks: {
       interval: 30000,  // 30 seconds
       timeout: 5000,    // 5 seconds
@@ -93,7 +93,7 @@ export const deployConfig = {
       'frame-src': ["'none'"],
       'object-src': ["'none'"]
     },
-    
+
     headers: {
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
@@ -142,7 +142,7 @@ export const deployConfig = {
 // Environment detection
 export function getCurrentEnvironment() {
   const hostname = window.location.hostname;
-  
+
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'development';
   } else if (hostname.includes('staging')) {
