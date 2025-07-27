@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { MapPinIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../hooks/useAuth';
 import { MobileMenu } from './MobileMenu';
+import { ThemeToggle } from '../Common/ThemeToggle';
 import { announceToScreenReader } from '../../utils/accessibility';
 
 export const Header: React.FC = () => {
@@ -43,6 +44,8 @@ export const Header: React.FC = () => {
 
           {/* User Menu */}
           <div className="user-menu user-menu--improved" role="region" aria-label="User account">
+            {/* Theme Toggle */}
+            <ThemeToggle />
             {user ? (
               <div className="user-section user-section--spaced">
                 <Link
