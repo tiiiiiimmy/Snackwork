@@ -327,8 +327,10 @@ public class StoresControllerTests : IClassFixture<WebApplicationFactoryFixture>
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        // Verify store is soft deleted
-        var deletedStore = await context.Stores.FindAsync(store.Id);
+        // Verify store is soft deleted - use fresh context to avoid caching issues
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var deletedStore = await verifyContext.Stores.FindAsync(store.Id);
         deletedStore.Should().NotBeNull();
         deletedStore!.IsDeleted.Should().BeTrue();
     }

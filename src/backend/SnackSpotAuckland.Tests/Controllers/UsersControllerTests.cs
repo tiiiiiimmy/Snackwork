@@ -246,10 +246,12 @@ public class UsersControllerTests : IClassFixture<WebApplicationFactoryFixture>
         content.Should().Contain("newusername");
         content.Should().Contain("Updated bio");
         content.Should().Contain("new_insta");
-        content.Should().Contain("🎉");
+        content.Should().Contain("\\uD83C\\uDF89"); // Unicode escaped version of 🎉
 
-        // Verify in database
-        var updatedUser = await context.Users.FindAsync(user.Id);
+        // Verify in database - use fresh context to avoid caching issues
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        var updatedUser = await verifyContext.Users.FindAsync(user.Id);
         updatedUser!.Username.Should().Be("newusername");
         updatedUser.Bio.Should().Be("Updated bio");
         updatedUser.InstagramHandle.Should().Be("new_insta");
