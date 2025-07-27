@@ -48,14 +48,27 @@ public static class TestDataFactory
             Description = Faker.Lorem.Paragraph(),
             UserId = userId ?? Guid.NewGuid(),
             CategoryId = categoryId ?? Guid.NewGuid(),
-            Location = testPoint, // Use a simple fixed point for tests
-            ShopName = Faker.Company.CompanyName(),
-            ShopAddress = Faker.Address.FullAddress(),
-            ImageUrl = Faker.Internet.Avatar(),
+            StoreId = Guid.NewGuid(), // Link to a store instead of direct shop info
+            // Location removed as it's now derived from Store
+            Image = null, // Images are now stored as byte arrays
             AverageRating = Faker.Random.Decimal(1, 5),
             TotalRatings = Faker.Random.Int(0, 100),
             DataSource = Faker.PickRandom<DataSource>(),
             CreatedAt = DateTime.UtcNow.AddDays(-Faker.Random.Int(1, 90))
+        };
+    }
+
+    public static Store CreateStore(Guid? createdByUserId = null, string? name = null)
+    {
+        return new Store
+        {
+            Id = Guid.NewGuid(),
+            Name = name ?? Faker.Company.CompanyName(),
+            Address = Faker.Address.FullAddress(),
+            Latitude = (decimal)Faker.Random.Double(-37.0, -36.7), // Auckland latitude range
+            Longitude = (decimal)Faker.Random.Double(174.6, 175.0), // Auckland longitude range
+            CreatedByUserId = createdByUserId ?? Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow.AddDays(-Faker.Random.Int(1, 30))
         };
     }
 
