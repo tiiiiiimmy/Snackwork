@@ -146,10 +146,29 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "https://localhost:3000", "https://localhost:5173", "https://localhost:5174")
+            var allowedOrigins = new List<string>();
+
+            // Add Azure Static Web Apps URL if configured
+            var azureFrontendUrl = builder.Configuration["AZURE_FRONTEND_URL"];
+            if (!string.IsNullOrEmpty(azureFrontendUrl))
+            {
+                allowedOrigins.Add(azureFrontendUrl);
+            }
+
+            // Add production Azure Static Web Apps patterns
+            allowedOrigins.AddRange(new[]
+            {
+                "https://*.azurestaticapps.net",
+                "https://snackspot-auckland.azurestaticapps.net",
+                "https://snackspot.nz",
+                "https://www.snackspot.nz"
+            });
+
+            policy.WithOrigins(allowedOrigins.ToArray())
                   .AllowAnyHeader()
                   .AllowAnyMethod()
-                  .AllowCredentials();
+                  .AllowCredentials()
+                  .SetIsOriginAllowedToAllowWildcardSubdomains(); // Allow wildcard subdomains for Azure
         });
 });
 
