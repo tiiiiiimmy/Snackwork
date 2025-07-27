@@ -1,5 +1,4 @@
 using Bogus;
-using NetTopologySuite.Geometries;
 using SnackSpotAuckland.Api.Models;
 
 namespace SnackSpotAuckland.Tests.Helpers;
@@ -18,7 +17,6 @@ public static class TestDataFactory
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("TestPassword123!"),
             Level = Faker.Random.Int(1, 5),
             ExperiencePoints = Faker.Random.Int(0, 1000),
-            Location = null, // Avoid spatial data issues in in-memory database
             CreatedAt = DateTime.UtcNow.AddDays(-Faker.Random.Int(1, 365)),
             UpdatedAt = DateTime.UtcNow
         };
@@ -38,9 +36,6 @@ public static class TestDataFactory
 
     public static Snack CreateSnack(Guid? userId = null, Guid? categoryId = null, string? name = null)
     {
-        var geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-        var testPoint = geometryFactory.CreatePoint(new Coordinate(174.7633, -36.8485)); // Auckland coordinates
-        
         return new Snack
         {
             Id = Guid.NewGuid(),
@@ -49,8 +44,7 @@ public static class TestDataFactory
             UserId = userId ?? Guid.NewGuid(),
             CategoryId = categoryId ?? Guid.NewGuid(),
             StoreId = Guid.NewGuid(), // Link to a store instead of direct shop info
-            // Location removed as it's now derived from Store
-            Image = null, // Images are now stored as byte arrays
+            // Image is now stored as byte array, no HasImage property needed
             AverageRating = Faker.Random.Decimal(1, 5),
             TotalRatings = Faker.Random.Int(0, 100),
             DataSource = Faker.PickRandom<DataSource>(),
@@ -99,15 +93,7 @@ public static class TestDataFactory
         };
     }
 
-    private static Point CreateAucklandPoint()
-    {
-        // Auckland coordinates: roughly between -36.7 to -37.0 latitude and 174.6 to 175.0 longitude
-        var lat = Faker.Random.Double(-37.0, -36.7);
-        var lng = Faker.Random.Double(174.6, 175.0);
-        
-        var geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-        return geometryFactory.CreatePoint(new Coordinate(lng, lat));
-    }
+    // Removed CreateAucklandPoint as spatial data is no longer used in User model
 
     public static class AuthData
     {
