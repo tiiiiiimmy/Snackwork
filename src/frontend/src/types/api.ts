@@ -115,6 +115,13 @@ export interface CreateSnackRequest {
   storeId: string;
 }
 
+export interface UpdateSnackRequest {
+  name: string;
+  description?: string;
+  categoryId: string;
+  storeId: string;
+}
+
 export interface UploadImageRequest {
   snackId: string;
   image: File;

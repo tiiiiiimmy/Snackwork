@@ -6,6 +6,7 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { SnackDetail } from './pages/SnackDetail';
 import { AddSnack } from './pages/AddSnack';
+import { UserProfile } from './pages/UserProfile';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/snacks/:id" element={<SnackDetail />} />
             <Route path="/add-snack" element={<AddSnack />} />
+            <Route path="/users/:id" element={<UserProfile />} />
           </Routes>
         </Layout>
       </Router>

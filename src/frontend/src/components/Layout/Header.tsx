@@ -45,12 +45,16 @@ export const Header: React.FC = () => {
           <div className="user-menu" role="region" aria-label="User account">
             {user ? (
               <div className="user-section">
-                <div className="user-info">
+                <Link
+                  to={`/users/${user.id}`}
+                  className="user-info"
+                  aria-label="View your profile"
+                >
                   <div className="user-avatar" aria-hidden="true">
                     <UserIcon />
                   </div>
                   <span className="username">{user.username}</span>
-                </div>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="logout-button"

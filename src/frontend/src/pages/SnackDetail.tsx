@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { StarIcon, MapPinIcon, ClockIcon, UserIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { StarIcon, MapPinIcon, ClockIcon, UserIcon, PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner } from '../components/Common/LoadingSpinner';
 import { ReviewCard } from '../components/Reviews/ReviewCard';
 import { AddReviewForm } from '../components/Reviews/AddReviewForm';
+import { EditSnackModal } from '../components/Snacks/EditSnackModal';
+import { DeleteSnackModal } from '../components/Snacks/DeleteSnackModal';
 import apiService from '../services/api';
 import type { Snack, Review } from '../types/api';
 
@@ -19,6 +21,8 @@ export const SnackDetail: React.FC = () => {
   const [reviewsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAddReview, setShowAddReview] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -73,13 +77,25 @@ export const SnackDetail: React.FC = () => {
       console.log('No reviews found');
       return false;
     }
-    
+
     const userReview = reviews.find(review => review.user?.id === user.id);
     console.log('User ID:', user.id);
     console.log('Reviews:', reviews.map(r => ({ id: r.id, userId: r.user?.id, username: r.user?.username })));
     console.log('Has user reviewed:', !!userReview);
-    
+
     return !!userReview;
+  };
+
+  // Check if current user is the owner of the snack
+  const isOwner = user?.id === snack?.user.id;
+
+  const handleSnackUpdated = (updatedSnack: Snack) => {
+    setSnack(updatedSnack);
+    setShowEditModal(false);
+  };
+
+  const handleSnackDeleted = () => {
+    navigate('/');
   };
 
   const renderStars = (rating: number, size: 'sm' | 'lg' = 'sm') => {
@@ -166,11 +182,33 @@ export const SnackDetail: React.FC = () => {
             {/* Header */}
             <div className="snack-header">
               <div className="snack-header-top">
-                <h1 className="snack-name">{snack.name}</h1>
-                {snack.store && (
-                  <span className="shop-name">
-                    {snack.store.name}
-                  </span>
+                <div className="snack-title-section">
+                  <h1 className="snack-name">{snack.name}</h1>
+                  {snack.store && (
+                    <span className="shop-name">
+                      {snack.store.name}
+                    </span>
+                  )}
+                </div>
+                {isOwner && (
+                  <div className="snack-actions">
+                    <button
+                      onClick={() => setShowEditModal(true)}
+                      className="btn btn--secondary btn--small"
+                      title="Edit snack"
+                    >
+                      <PencilIcon />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteModal(true)}
+                      className="btn btn--danger btn--small"
+                      title="Delete snack"
+                    >
+                      <TrashIcon />
+                      <span>Delete</span>
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -211,10 +249,14 @@ export const SnackDetail: React.FC = () => {
                     <span>{snack.store.name}</span>
                   </div>
                 )}
-                <div className="snack-location">
+                <Link
+                  to={`/users/${snack.user.id}`}
+                  className="snack-location"
+                  aria-label={`View ${snack.user.username}'s profile`}
+                >
                   <UserIcon />
                   <span>Added by {snack.user.username}</span>
-                </div>
+                </Link>
                 <div className="snack-location">
                   <ClockIcon />
                   <span>Added {formatDate(snack.createdAt)}</span>
@@ -288,6 +330,26 @@ export const SnackDetail: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {snack && (
+        <EditSnackModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSnackUpdated={handleSnackUpdated}
+          snack={snack}
+        />
+      )}
+
+      {/* Delete Modal */}
+      {snack && (
+        <DeleteSnackModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onSnackDeleted={handleSnackDeleted}
+          snack={snack}
+        />
+      )}
     </div>
   );
 };

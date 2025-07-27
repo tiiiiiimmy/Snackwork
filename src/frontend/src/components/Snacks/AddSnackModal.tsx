@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StoreList } from '../Stores/StoreList';
 import { AddStoreModal } from '../Stores/AddStoreModal';
+import { AddCategoryModal } from '../Categories/AddCategoryModal';
 import { apiService } from '../../services/api';
 import type { CreateSnackRequest, Category, Store, Snack } from '../../types/api';
 
@@ -27,6 +28,7 @@ export const AddSnackModal: React.FC<AddSnackModalProps> = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [showAddStore, setShowAddStore] = useState(false);
+  const [showAddCategory, setShowAddCategory] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -279,6 +281,15 @@ export const AddSnackModal: React.FC<AddSnackModalProps> = ({
                     </option>
                   ))}
                 </select>
+                <div className="form__actions">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddCategory(true)}
+                    className="btn btn--secondary btn--small"
+                  >
+                    + Add New Category
+                  </button>
+                </div>
               </div>
 
               {/* Store Selection */}
@@ -370,6 +381,16 @@ export const AddSnackModal: React.FC<AddSnackModalProps> = ({
           handleStoreSelect(store);
         }}
         initialLocation={userLocation}
+      />
+
+      <AddCategoryModal
+        isOpen={showAddCategory}
+        onClose={() => setShowAddCategory(false)}
+        onCategoryCreated={(category) => {
+          setCategories(prev => [...prev, category]);
+          setFormData(prev => ({ ...prev, categoryId: category.id }));
+          setShowAddCategory(false);
+        }}
       />
     </>
   );

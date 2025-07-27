@@ -1,6 +1,7 @@
 import React from 'react';
 import { StarIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
+import { Link } from 'react-router-dom';
 import type { Review } from '../../types/api';
 
 interface ReviewCardProps {
@@ -55,7 +56,11 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
   return (
     <div className="review-card">
       <div className="review-header">
-        <div className="review-author">
+        <Link
+          to={`/users/${review.user?.id || ''}`}
+          className="review-author"
+          aria-label={`View ${username}'s profile`}
+        >
           <div className="author-avatar">
             {userInitials}
           </div>
@@ -63,7 +68,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
             <div className="author-name">{username}</div>
             <div className="review-date">{formatDate(review.createdAt)}</div>
           </div>
-        </div>
+        </Link>
         {renderStars(review.rating)}
       </div>
 
