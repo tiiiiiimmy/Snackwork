@@ -143,10 +143,10 @@ public class UsersController : ControllerBase
             // Update profile fields
             if (request.InstagramHandle != null)
                 user.InstagramHandle = request.InstagramHandle.Trim();
-            
+
             if (request.Bio != null)
                 user.Bio = request.Bio.Trim();
-            
+
             if (!string.IsNullOrEmpty(request.AvatarEmoji))
                 user.AvatarEmoji = request.AvatarEmoji;
 

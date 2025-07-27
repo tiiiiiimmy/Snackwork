@@ -79,31 +79,6 @@ cd ../../..
 echo "✅ All pre-commit checks passed!"
 EOF
 
-# Create commit-msg hook
-cat > .git/hooks/commit-msg << 'EOF'
-#!/bin/bash
-
-commit_regex='^(feat|fix|docs|style|refactor|test|chore|ci|build|perf|revert)(\(.+\))?: .{1,100}$'
-
-if ! grep -qE "$commit_regex" "$1"; then
-    echo "❌ Invalid commit message format!"
-    echo ""
-    echo "📝 Commit message must follow the format:"
-    echo "   type(scope): description"
-    echo ""
-    echo "🏷️  Valid types: feat, fix, docs, style, refactor, test, chore, ci, build, perf, revert"
-    echo ""
-    echo "💡 Examples:"
-    echo "   feat(auth): add JWT token refresh functionality"
-    echo "   fix(map): resolve marker clustering performance issue"
-    echo "   docs(api): update authentication endpoints documentation"
-    echo ""
-    exit 1
-fi
-
-echo "✅ Commit message format is valid!"
-EOF
-
 # Create pre-push hook
 cat > .git/hooks/pre-push << 'EOF'
 #!/bin/bash
@@ -133,20 +108,15 @@ fi
 echo "✅ Pre-push checks completed!"
 EOF
 
+# Commit message validation hook removed as per updated requirements.
+
 # Make hooks executable
 chmod +x .git/hooks/pre-commit
-chmod +x .git/hooks/commit-msg
 chmod +x .git/hooks/pre-push
 
 echo "✅ Git hooks setup complete!"
 echo ""
 echo "🎣 Installed hooks:"
 echo "  - pre-commit: Runs linting and type checking"
-echo "  - commit-msg: Validates commit message format"
 echo "  - pre-push: Runs tests before pushing"
 echo ""
-echo "📝 Commit message format: type(scope): description"
-echo "   Examples:"
-echo "   - feat(auth): add JWT token refresh functionality"
-echo "   - fix(map): resolve marker clustering performance issue"
-echo "   - docs(api): update authentication endpoints documentation"

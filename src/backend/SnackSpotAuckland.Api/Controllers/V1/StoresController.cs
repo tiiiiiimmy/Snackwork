@@ -27,7 +27,7 @@ public class StoresController : ControllerBase
         if (!string.IsNullOrWhiteSpace(search))
         {
             var searchLower = search.ToLower().Trim();
-            query = query.Where(s => s.Name.ToLower().Contains(searchLower) || 
+            query = query.Where(s => s.Name.ToLower().Contains(searchLower) ||
                                    (s.Address != null && s.Address.ToLower().Contains(searchLower)));
         }
 
@@ -74,8 +74,8 @@ public class StoresController : ControllerBase
         var normalizedName = request.Name.Trim().ToLower();
         var existingStore = await _context.Stores
             .Where(s => !s.IsDeleted)
-            .FirstOrDefaultAsync(s => s.Name.ToLower() == normalizedName && 
-                                    s.Latitude == request.Latitude && 
+            .FirstOrDefaultAsync(s => s.Name.ToLower() == normalizedName &&
+                                    s.Latitude == request.Latitude &&
                                     s.Longitude == request.Longitude);
 
         if (existingStore != null)
