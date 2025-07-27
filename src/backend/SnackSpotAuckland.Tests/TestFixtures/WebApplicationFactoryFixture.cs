@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using SnackSpotAuckland.Api.Data;
 using SnackSpotAuckland.Api.Services;
 using SnackSpotAuckland.Api.Middleware;
@@ -15,6 +18,11 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>
 {
     private readonly string _databaseName = $"TestDb_{Guid.NewGuid()}";
     
+    // Use the exact same JWT key as TestAuthHelper
+    private const string TestJwtKey = "test-super-secret-key-at-least-256-bits-long-for-security-testing-purposes";
+    private const string TestIssuer = "SnackSpotAuckland.Tests";
+    private const string TestAudience = "SnackSpotAuckland.Tests";
+    
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -24,9 +32,9 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>
         {
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Jwt:Key"] = "test-super-secret-key-at-least-256-bits-long-for-security-testing-purposes",
-                ["Jwt:Issuer"] = "SnackSpotAuckland.Tests",
-                ["Jwt:Audience"] = "SnackSpotAuckland.Tests",
+                ["Jwt:Key"] = TestJwtKey,
+                ["Jwt:Issuer"] = TestIssuer,
+                ["Jwt:Audience"] = TestAudience,
                 ["Jwt:AccessTokenExpiryMinutes"] = "60",
                 ["Jwt:RefreshTokenExpiryDays"] = "30",
                 // Disable rate limiting for tests
@@ -61,6 +69,37 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>
             // Ensure other required services are registered
             services.AddScoped<IAuthService, AuthService>();
             
+            // Remove existing JWT authentication configuration and re-add with correct settings
+            var jwtDescriptors = services.Where(d =>
+                d.ServiceType.FullName?.Contains("JwtBearer") == true ||
+                d.ServiceType.FullName?.Contains("Authentication") == true ||
+                d.ImplementationType?.FullName?.Contains("JwtBearer") == true
+            ).ToList();
+
+            foreach (var descriptor in jwtDescriptors)
+            {
+                services.Remove(descriptor);
+            }
+
+            // Re-add JWT authentication with exact test configuration
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = TestIssuer,
+                        ValidAudience = TestAudience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TestJwtKey)),
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
+            services.AddAuthorization();
+
             // Disable rate limiting for tests
             services.Configure<RateLimitOptions>(options =>
             {
