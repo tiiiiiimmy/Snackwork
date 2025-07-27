@@ -6,6 +6,7 @@ export const mockUser: User = {
   email: 'test@example.com',
   level: 2,
   experiencePoints: 150,
+  avatarEmoji: '👤',
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z'
 }
@@ -16,21 +17,24 @@ export const mockCategories: Category[] = [
     name: 'Sweet Snacks',
     description: 'Cookies, chocolates, and other sweet treats',
     createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    updatedAt: '2024-01-01T00:00:00Z',
+    isDeleted: false
   },
   {
     id: 'cat-2',
     name: 'Savory Snacks',
     description: 'Chips, crackers, and salty snacks',
     createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    updatedAt: '2024-01-01T00:00:00Z',
+    isDeleted: false
   },
   {
     id: 'cat-3',
     name: 'Healthy Snacks',
     description: 'Nuts, fruits, and nutritious options',
     createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
+    updatedAt: '2024-01-01T00:00:00Z',
+    isDeleted: false
   }
 ]
 
@@ -40,93 +44,102 @@ export const mockSnacks: Snack[] = [
     name: 'Chocolate Chip Cookie',
     description: 'Delicious homemade chocolate chip cookie',
     categoryId: 'cat-1',
-    category: mockCategories[0],
-    userId: 'user-1',
-    username: 'testuser',
-    latitude: -36.8485,
-    longitude: 174.7633,
-    location: 'Auckland CBD',
-    shopName: 'Sweet Treats Bakery',
-    shopAddress: '123 Queen Street, Auckland',
-    imageUrl: 'https://example.com/cookie.jpg',
+    category: 'Sweet Snacks', // Just the category name
+    hasImage: true,
+    store: {
+      id: 'store-1',
+      name: 'Sweet Treats Bakery',
+      address: '123 Queen Street, Auckland',
+      latitude: -36.8485,
+      longitude: 174.7633,
+      createdAt: '2024-01-01T00:00:00Z'
+    },
+    user: {
+      id: 'user-1',
+      username: 'testuser'
+    },
     averageRating: 4.5,
     totalRatings: 12,
-    dataSource: 'user',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-15T10:30:00Z'
+    createdAt: '2024-01-01T00:00:00Z'
   },
   {
     id: 'snack-2',
     name: 'Potato Chips',
-    description: 'Crispy salted potato chips',
+    description: 'Crispy and salty potato chips',
     categoryId: 'cat-2',
-    category: mockCategories[1],
-    userId: 'user-2',
-    username: 'snacklover',
-    latitude: -36.8600,
-    longitude: 174.7700,
-    location: 'Ponsonby',
-    shopName: 'Corner Store',
-    shopAddress: '456 Ponsonby Road, Auckland',
-    imageUrl: 'https://example.com/chips.jpg',
+    category: 'Savory Snacks',
+    hasImage: false,
+    store: {
+      id: 'store-2',
+      name: 'Corner Store',
+      address: '456 Main Street, Auckland',
+      latitude: -36.8486,
+      longitude: 174.7634,
+      createdAt: '2024-01-01T00:00:00Z'
+    },
+    user: {
+      id: 'user-1',
+      username: 'testuser'
+    },
     averageRating: 3.8,
     totalRatings: 8,
-    dataSource: 'user',
-    createdAt: '2024-01-20T14:15:00Z',
-    updatedAt: '2024-01-20T14:15:00Z'
+    createdAt: '2024-01-02T00:00:00Z'
   },
   {
     id: 'snack-3',
-    name: 'Mixed Nuts',
-    description: 'Healthy mix of almonds, cashews, and walnuts',
+    name: 'Trail Mix',
+    description: 'Healthy mix of nuts and dried fruits',
     categoryId: 'cat-3',
-    category: mockCategories[2],
-    userId: 'user-3',
-    username: 'healthnut',
-    latitude: -36.8700,
-    longitude: 174.7500,
-    location: 'Newmarket',
-    shopName: 'Health Food Store',
-    shopAddress: '789 Broadway, Newmarket',
-    imageUrl: 'https://example.com/nuts.jpg',
+    category: 'Healthy Snacks',
+    hasImage: true,
+    store: {
+      id: 'store-3',
+      name: 'Health Food Store',
+      address: '789 Health Ave, Auckland',
+      latitude: -36.8487,
+      longitude: 174.7635,
+      createdAt: '2024-01-01T00:00:00Z'
+    },
+    user: {
+      id: 'user-2',
+      username: 'healthyfoodie'
+    },
     averageRating: 4.2,
     totalRatings: 15,
-    dataSource: 'user',
-    createdAt: '2024-01-25T09:45:00Z',
-    updatedAt: '2024-01-25T09:45:00Z'
+    createdAt: '2024-01-03T00:00:00Z'
   }
 ]
 
 export const mockReviews: Review[] = [
   {
     id: 'review-1',
-    snackId: 'snack-1',
-    userId: 'user-2',
-    username: 'snacklover',
     rating: 5,
     comment: 'Amazing cookie! Best I\'ve ever had.',
     createdAt: '2024-01-16T12:00:00Z',
-    updatedAt: '2024-01-16T12:00:00Z'
+    user: {
+      id: 'user-2',
+      username: 'snacklover'
+    }
   },
   {
     id: 'review-2',
-    snackId: 'snack-1',
-    userId: 'user-3',
-    username: 'healthnut',
     rating: 4,
     comment: 'Really good, but a bit too sweet for me.',
     createdAt: '2024-01-17T15:30:00Z',
-    updatedAt: '2024-01-17T15:30:00Z'
+    user: {
+      id: 'user-3',
+      username: 'healthnut'
+    }
   },
   {
     id: 'review-3',
-    snackId: 'snack-2',
-    userId: 'user-1',
-    username: 'testuser',
     rating: 4,
     comment: 'Great crunch and flavor!',
     createdAt: '2024-01-21T11:20:00Z',
-    updatedAt: '2024-01-21T11:20:00Z'
+    user: {
+      id: 'user-1',
+      username: 'testuser'
+    }
   }
 ]
 

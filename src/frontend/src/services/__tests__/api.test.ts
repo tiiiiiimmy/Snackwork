@@ -96,7 +96,7 @@ describe('API Service', () => {
 
       const result = await apiService.getCurrentUser()
 
-      expect(mockGet).toHaveBeenCalledWith('/auth/profile')
+      expect(mockGet).toHaveBeenCalledWith('/users/me')
       expect(result).toEqual(mockUser)
     })
   })

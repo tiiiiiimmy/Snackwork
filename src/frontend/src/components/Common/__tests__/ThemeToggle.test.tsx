@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the useTheme hook for isolated testing
 const mockSetTheme = vi.fn();
-const mockThemeContext = {
+let mockThemeContext = {
     theme: 'light' as const,
     setTheme: mockSetTheme,
     isDark: false,
@@ -30,8 +30,11 @@ describe('ThemeToggle', () => {
     beforeEach(() => {
         mockSetTheme.mockClear();
         // Reset context values
-        mockThemeContext.theme = 'light';
-        mockThemeContext.isDark = false;
+        mockThemeContext = {
+            theme: 'light',
+            setTheme: mockSetTheme,
+            isDark: false,
+        };
     });
 
     it('renders with light theme icon and label', () => {
@@ -65,25 +68,30 @@ describe('ThemeToggle', () => {
     });
 
     it('cycles through themes correctly on click', () => {
-        render(<ThemeToggle />);
-
+        const { rerender } = render(<ThemeToggle />);
         const button = screen.getByRole('button');
 
         // Light -> Dark
         fireEvent.click(button);
         expect(mockSetTheme).toHaveBeenCalledWith('dark');
 
-        // Simulate dark theme
+        // Update mock context and rerender
         mockThemeContext.theme = 'dark';
+        mockThemeContext.isDark = true;
         mockSetTheme.mockClear();
+        rerender(<ThemeToggle />);
 
+        // Dark -> System
         fireEvent.click(button);
         expect(mockSetTheme).toHaveBeenCalledWith('system');
 
-        // Simulate system theme
+        // Update mock context and rerender
         mockThemeContext.theme = 'system';
+        mockThemeContext.isDark = false;
         mockSetTheme.mockClear();
+        rerender(<ThemeToggle />);
 
+        // System -> Light
         fireEvent.click(button);
         expect(mockSetTheme).toHaveBeenCalledWith('light');
     });
