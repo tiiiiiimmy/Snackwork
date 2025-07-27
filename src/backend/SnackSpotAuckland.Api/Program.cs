@@ -155,19 +155,22 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Apply database migrations in production
-using (var scope = app.Services.CreateScope())
+// Apply database migrations in production (skip for testing environment)
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
-    try
+    using (var scope = app.Services.CreateScope())
     {
-        context.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database");
-        throw;
+        var context = scope.ServiceProvider.GetRequiredService<SnackSpotDbContext>();
+        try
+        {
+            context.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while migrating the database");
+            throw;
+        }
     }
 }
 

@@ -26,8 +26,7 @@ jobs:
     
     - name: Backend Tests
       run: |
-        cd src/backend/SnackSpotAuckland.Tests
-        dotnet test --verbosity minimal
+        dotnet test src/backend/SnackSpotAuckland.Tests/SnackSpotAuckland.Tests.csproj --verbosity minimal
     
     - name: Frontend Tests
       run: |
