@@ -146,7 +146,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            var allowedOrigins = new List<string>();
+            var allowedOrigins = new List<string>
+            {
+                // Production Azure Static Web Apps URL (your actual deployed frontend)
+                "https://happy-mud-00e53cd00.1.azurestaticapps.net"
+            };
 
             // Add Azure Static Web Apps URL if configured
             var azureFrontendUrl = builder.Configuration["AZURE_FRONTEND_URL"];
@@ -155,7 +159,7 @@ builder.Services.AddCors(options =>
                 allowedOrigins.Add(azureFrontendUrl);
             }
 
-            // Add production Azure Static Web Apps patterns
+            // Add additional production Azure Static Web Apps patterns
             allowedOrigins.AddRange(new[]
             {
                 "https://*.azurestaticapps.net",
