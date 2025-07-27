@@ -365,7 +365,11 @@ public class InputValidationMiddleware
             "Sec-Fetch-User", "Sec-Fetch-Dest", "Upgrade-Insecure-Requests",
             // Additional standard headers
             "DNT", "Content-Encoding", "Transfer-Encoding", "TE", "Pragma", "Expires",
-            "Last-Modified", "If-Modified-Since", "If-None-Match", "ETag", "Vary"
+            "Last-Modified", "If-Modified-Since", "If-None-Match", "ETag", "Vary",
+            // Azure App Service headers
+            "X-ARR-SSL", "X-ARR-LOG-ID", "X-Site-Deployment-Id", "X-Original-URL", "X-Forwarded-Host",
+            "X-Azure-FDID", "X-Azure-RequestId", "X-MS-CLIENT-PRINCIPAL", "X-MS-CLIENT-PRINCIPAL-NAME",
+            "X-MS-CLIENT-PRINCIPAL-ID", "X-MS-CLIENT-PRINCIPAL-IDP"
         };
 
         return systemHeaders.Contains(headerName);
