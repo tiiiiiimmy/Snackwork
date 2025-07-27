@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPinIcon, UserIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { MapPinIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../hooks/useAuth';
 import { MobileMenu } from './MobileMenu';
 import { announceToScreenReader } from '../../utils/accessibility';
@@ -32,32 +32,32 @@ export const Header: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="desktop-nav" aria-label="Main navigation">
+          <nav className="desktop-nav desktop-nav--spaced" aria-label="Main navigation">
             <Link to="/" className="nav-link">
               Home
             </Link>
-            <Link to="/add-snack" className="nav-link nav-link-primary">
+            <Link to="/add-snack" className="nav-link nav-link--primary">
               Add Snack
             </Link>
           </nav>
 
           {/* User Menu */}
-          <div className="user-menu" role="region" aria-label="User account">
+          <div className="user-menu user-menu--improved" role="region" aria-label="User account">
             {user ? (
-              <div className="user-section">
+              <div className="user-section user-section--spaced">
                 <Link
                   to={`/users/${user.id}`}
-                  className="user-info"
+                  className="user-info user-info--with-emoji"
                   aria-label="View your profile"
                 >
                   <div className="user-avatar" aria-hidden="true">
-                    <UserIcon />
+                    {user.avatarEmoji || '🍪'}
                   </div>
                   <span className="username">{user.username}</span>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="logout-button"
+                  className="logout-button logout-button--compact"
                   data-testid="logout-button"
                   aria-label="Log out of your account"
                 >
@@ -65,11 +65,11 @@ export const Header: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="auth-buttons">
+              <div className="auth-buttons auth-buttons--spaced">
                 <Link to="/login" className="auth-link" data-testid="login-link">
                   Login
                 </Link>
-                <Link to="/register" className="auth-link auth-link-primary">
+                <Link to="/register" className="auth-link auth-link--primary">
                   Register
                 </Link>
               </div>

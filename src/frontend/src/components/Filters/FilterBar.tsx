@@ -48,46 +48,49 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   };
 
   return (
-    <div className="filter-bar">
-      <div className="filter-content">
-        {/* Search */}
-        <form onSubmit={handleSearch} className="search-form" role="search">
-          <div className="search-input-container">
-            <MagnifyingGlassIcon className="search-icon" aria-hidden="true" />
-            <label htmlFor="snack-search" className="sr-only">
-              Search for snacks
-            </label>
-            <input
-              id="snack-search"
-              type="text"
-              placeholder="Search snacks..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="form-input search-input"
-              aria-label="Search for snacks"
-            />
-          </div>
-        </form>
+    <div className="filter-bar filter-bar--compact">
+      <div className="filter-content filter-content--tighter">
+        {/* Search and Filters Box */}
+        <div className="search-filter-box">
+          {/* Search */}
+          <form onSubmit={handleSearch} className="search-form search-form--boxed" role="search">
+            <div className="search-input-container search-input-container--boxed">
+              <MagnifyingGlassIcon className="search-icon" aria-hidden="true" />
+              <label htmlFor="snack-search" className="sr-only">
+                Search for snacks
+              </label>
+              <input
+                id="snack-search"
+                type="text"
+                placeholder="Search snacks..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="form-input search-input search-input--boxed"
+                aria-label="Search for snacks"
+              />
+            </div>
+          </form>
 
-        {/* Filters toggle */}
-        <div className="filter-group">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`toggle-button ${showFilters ? 'active' : ''}`}
-            aria-expanded={showFilters}
-            aria-controls="expanded-filters"
-            aria-label={`${showFilters ? 'Hide' : 'Show'} filter options`}
-          >
-            <AdjustmentsHorizontalIcon aria-hidden="true" />
-            <span className={showFilters ? 'show' : 'hide'}>Filters</span>
-          </button>
+          {/* Filters toggle */}
+          <div className="filter-group filter-group--boxed">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`toggle-button toggle-button--boxed ${showFilters ? 'active' : ''}`}
+              aria-expanded={showFilters}
+              aria-controls="expanded-filters"
+              aria-label={`${showFilters ? 'Hide' : 'Show'} filter options`}
+            >
+              <AdjustmentsHorizontalIcon aria-hidden="true" />
+              <span className={showFilters ? 'show' : 'hide'}>Filters</span>
+            </button>
+          </div>
         </div>
 
         {/* View mode toggle */}
-        <div className="view-toggle" role="group" aria-label="View mode selection">
+        <div className="view-toggle view-toggle--compact" role="group" aria-label="View mode selection">
           <button
             onClick={() => onViewModeChange('map')}
-            className={`toggle-button ${viewMode === 'map' ? 'active' : ''}`}
+            className={`toggle-button toggle-button--compact ${viewMode === 'map' ? 'active' : ''}`}
             aria-pressed={viewMode === 'map'}
             aria-label="Switch to map view"
           >
@@ -96,7 +99,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           </button>
           <button
             onClick={() => onViewModeChange('list')}
-            className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
+            className={`toggle-button toggle-button--compact ${viewMode === 'list' ? 'active' : ''}`}
             aria-pressed={viewMode === 'list'}
             aria-label="Switch to list view"
           >

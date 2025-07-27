@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { StarIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { apiService } from '../../services/api';
@@ -10,6 +10,7 @@ interface SnackCardProps {
 }
 
 export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
+  const navigate = useNavigate();
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -54,16 +55,19 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 1) return '1 day ago';
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
     return date.toLocaleDateString();
   };
 
+  const username = snack.user?.username || 'Unknown';
+  const userId = snack.user?.id;
+
   return (
-    <Link 
-      to={`/snacks/${snack.id}`} 
+    <Link
+      to={`/snacks/${snack.id}`}
       className="snack-card-link"
       aria-label={`View details for ${snack.name} - ${snack.averageRating.toFixed(1)} stars`}
     >
@@ -82,7 +86,7 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
               🍪
             </div>
           )}
-          
+
           {/* Category Badge */}
           <div className="snack-card__badge">
             {snack.category}
@@ -126,15 +130,22 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
 
           {/* Footer */}
           <div className="snack-card__footer">
-            <div className="snack-card__user">
+            <button
+              type="button"
+              className="snack-card__user snack-card__user--button"
+              aria-label={`View ${username}'s profile`}
+              onClick={() => {
+                if (userId) navigate(`/users/${userId}`);
+              }}
+            >
               <div className="snack-card__user-avatar">
-                {snack.user.username.charAt(0).toUpperCase()}
+                {username.charAt(0).toUpperCase()}
               </div>
               <span className="snack-card__user-name">
-                {snack.user.username}
+                {username}
               </span>
-            </div>
-            
+            </button>
+
             <div className="snack-card__date">
               {formatTimeAgo(snack.createdAt)}
             </div>

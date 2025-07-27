@@ -42,7 +42,12 @@ body {
 }
 
 // Typography
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
   font-weight: $font-weight-semibold;
   line-height: $line-height-tight;
@@ -76,7 +81,7 @@ h6 {
 p {
   @include text-body;
   margin: 0 0 $spacing-4;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -86,11 +91,11 @@ a {
   color: var(--color-primary);
   text-decoration: none;
   transition: color $transition-fast;
-  
+
   &:hover {
     color: var(--color-primary-dark);
   }
-  
+
   &:focus {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
@@ -99,17 +104,18 @@ a {
 }
 
 // Lists
-ul, ol {
+ul,
+ol {
   padding-left: $spacing-6;
   margin-bottom: $spacing-4;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
-  
+
   li {
     margin-bottom: $spacing-1;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
@@ -148,7 +154,7 @@ img {
 ::-webkit-scrollbar-thumb {
   background: var(--border-primary);
   border-radius: $radius-base;
-  
+
   &:hover {
     background: var(--text-tertiary);
   }
@@ -197,32 +203,101 @@ img {
 }
 
 // Spacing utilities
-.mt-0 { margin-top: $spacing-0; }
-.mt-1 { margin-top: $spacing-1; }
-.mt-2 { margin-top: $spacing-2; }
-.mt-3 { margin-top: $spacing-3; }
-.mt-4 { margin-top: $spacing-4; }
-.mt-5 { margin-top: $spacing-5; }
-.mt-6 { margin-top: $spacing-6; }
-.mt-8 { margin-top: $spacing-8; }
+.mt-0 {
+  margin-top: $spacing-0;
+}
 
-.mb-0 { margin-bottom: $spacing-0; }
-.mb-1 { margin-bottom: $spacing-1; }
-.mb-2 { margin-bottom: $spacing-2; }
-.mb-3 { margin-bottom: $spacing-3; }
-.mb-4 { margin-bottom: $spacing-4; }
-.mb-5 { margin-bottom: $spacing-5; }
-.mb-6 { margin-bottom: $spacing-6; }
-.mb-8 { margin-bottom: $spacing-8; }
+.mt-1 {
+  margin-top: $spacing-1;
+}
 
-.p-0 { padding: $spacing-0; }
-.p-1 { padding: $spacing-1; }
-.p-2 { padding: $spacing-2; }
-.p-3 { padding: $spacing-3; }
-.p-4 { padding: $spacing-4; }
-.p-5 { padding: $spacing-5; }
-.p-6 { padding: $spacing-6; }
-.p-8 { padding: $spacing-8; }
+.mt-2 {
+  margin-top: $spacing-2;
+}
+
+.mt-3 {
+  margin-top: $spacing-3;
+}
+
+.mt-4 {
+  margin-top: $spacing-4;
+}
+
+.mt-5 {
+  margin-top: $spacing-5;
+}
+
+.mt-6 {
+  margin-top: $spacing-6;
+}
+
+.mt-8 {
+  margin-top: $spacing-8;
+}
+
+.mb-0 {
+  margin-bottom: $spacing-0;
+}
+
+.mb-1 {
+  margin-bottom: $spacing-1;
+}
+
+.mb-2 {
+  margin-bottom: $spacing-2;
+}
+
+.mb-3 {
+  margin-bottom: $spacing-3;
+}
+
+.mb-4 {
+  margin-bottom: $spacing-4;
+}
+
+.mb-5 {
+  margin-bottom: $spacing-5;
+}
+
+.mb-6 {
+  margin-bottom: $spacing-6;
+}
+
+.mb-8 {
+  margin-bottom: $spacing-8;
+}
+
+.p-0 {
+  padding: $spacing-0;
+}
+
+.p-1 {
+  padding: $spacing-1;
+}
+
+.p-2 {
+  padding: $spacing-2;
+}
+
+.p-3 {
+  padding: $spacing-3;
+}
+
+.p-4 {
+  padding: $spacing-4;
+}
+
+.p-5 {
+  padding: $spacing-5;
+}
+
+.p-6 {
+  padding: $spacing-6;
+}
+
+.p-8 {
+  padding: $spacing-8;
+}
 
 // Animation utilities
 .fade-in {
@@ -281,24 +356,24 @@ img {
 
 .search-input-container {
   position: relative;
-  
+
   .search-icon {
     position: absolute;
     left: $spacing-3;
     top: 50%;
     transform: translateY(-50%);
-    width: 20px !important;  // Force proper icon size
+    width: 20px !important; // Force proper icon size
     height: 20px !important; // Force proper icon size
     color: var(--text-tertiary);
     pointer-events: none;
     z-index: 1;
   }
-  
+
   .search-input {
     @include input-base;
     width: 100%;
     padding-left: $spacing-10;
-    
+
     &::placeholder {
       color: var(--text-quaternary);
     }
@@ -321,25 +396,25 @@ img {
   color: var(--text-secondary);
   border-radius: $radius-md;
   transition: all $transition-fast;
-  
+
   // Force proper icon sizing for ALL icons
   svg {
     width: 20px !important;
     height: 20px !important;
     flex-shrink: 0;
   }
-  
+
   &:hover {
     background: var(--bg-secondary);
     color: var(--text-primary);
   }
-  
+
   &.active {
     background: var(--color-primary);
     color: var(--text-on-primary);
     border-color: var(--color-primary);
   }
-  
+
   span {
     @include text-callout;
     font-weight: $font-weight-medium;
@@ -366,21 +441,21 @@ svg[aria-hidden="true"] {
 .page {
   min-height: 100vh;
   padding-top: 80px; // Account for fixed navbar
-  
+
   @media (max-width: $breakpoint-md) {
     padding-bottom: 80px; // Account for bottom nav on mobile
   }
-  
+
   &__header {
     padding: $spacing-8 0 $spacing-6;
     text-align: center;
     background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
-    
+
     &-title {
       @include text-large-title;
       margin-bottom: $spacing-4;
     }
-    
+
     &-subtitle {
       @include text-title-3;
       color: var(--text-secondary);
@@ -388,7 +463,7 @@ svg[aria-hidden="true"] {
       margin: 0 auto;
     }
   }
-  
+
   &__content {
     padding: $spacing-8 0;
   }
@@ -398,19 +473,19 @@ svg[aria-hidden="true"] {
 .error-state {
   text-align: center;
   padding: $spacing-12 $spacing-6;
-  
+
   &__icon {
     font-size: $font-size-5xl;
     margin-bottom: $spacing-4;
     opacity: 0.5;
   }
-  
+
   &__title {
     @include text-title-3;
     margin-bottom: $spacing-2;
     color: var(--text-secondary);
   }
-  
+
   &__message {
     @include text-body;
     color: var(--text-tertiary);
@@ -425,19 +500,19 @@ svg[aria-hidden="true"] {
 .success-state {
   text-align: center;
   padding: $spacing-8 $spacing-6;
-  
+
   &__icon {
     font-size: $font-size-4xl;
     color: var(--color-success);
     margin-bottom: $spacing-4;
   }
-  
+
   &__title {
     @include text-title-3;
     margin-bottom: $spacing-2;
     color: var(--color-success);
   }
-  
+
   &__message {
     @include text-body;
     color: var(--text-secondary);
@@ -447,23 +522,24 @@ svg[aria-hidden="true"] {
 
 // Print styles
 @media print {
+
   .navbar,
   .bottom-nav,
   .fab,
   .modal-overlay {
     display: none !important;
   }
-  
+
   .page {
     padding-top: 0;
     padding-bottom: 0;
   }
-  
+
   body {
     background: white !important;
     color: black !important;
   }
-  
+
   .card {
     box-shadow: none !important;
     border: 1px solid #ccc !important;
@@ -482,6 +558,7 @@ svg[aria-hidden="true"] {
 
 // Reduced motion support
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -502,7 +579,7 @@ svg[aria-hidden="true"] {
 .layout-main {
   flex: 1;
   padding-top: 64px; // Account for fixed header
-  
+
   @media (max-width: $breakpoint-md) {
     padding-bottom: 64px; // Account for mobile nav
   }
@@ -519,17 +596,22 @@ svg[aria-hidden="true"] {
   border-bottom: 1px solid var(--border-secondary);
   z-index: $z-fixed;
   @include glass-morphism;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .header-container {
   @include container;
   height: 100%;
+  max-width: 1200px;
+  padding: 0 1rem;
 }
 
 .header-content {
   @include flex-between;
   height: 100%;
   align-items: center;
+  gap: 2rem;
 }
 
 .header-logo {
@@ -537,23 +619,33 @@ svg[aria-hidden="true"] {
   gap: $spacing-2;
   text-decoration: none;
   color: var(--text-primary);
-  
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
   .logo-icon {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     color: var(--color-primary);
   }
-  
+
   .logo-text {
     @include text-headline;
     font-weight: $font-weight-bold;
+    font-size: 1.125rem;
+    color: #1D1D1F;
   }
 }
 
 .desktop-nav {
   @include flex-center;
-  gap: $spacing-6;
-  
+  gap: 1.5rem;
+  flex: 1;
+  justify-content: center;
+
   @media (max-width: $breakpoint-md) {
     display: none;
   }
@@ -564,11 +656,16 @@ svg[aria-hidden="true"] {
   color: var(--text-secondary);
   text-decoration: none;
   transition: color $transition-fast;
-  
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+
   &:hover {
     color: var(--color-primary);
+    background: rgba(0, 122, 255, 0.1);
   }
-  
+
   &-primary {
     @include button-primary;
     padding: $spacing-2 $spacing-4;
@@ -576,9 +673,24 @@ svg[aria-hidden="true"] {
   }
 }
 
+.nav-link--primary {
+  background: #007AFF;
+  color: white !important;
+  font-weight: 600;
+
+  &:hover {
+    background: #0056D3 !important;
+    color: white !important;
+  }
+}
+
 .user-menu {
-  @include flex-center;
-  gap: $spacing-3;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: $breakpoint-md) {
+    gap: 0.5rem;
+  }
 }
 
 .user-section {
@@ -622,11 +734,11 @@ svg[aria-hidden="true"] {
   color: var(--text-secondary);
   text-decoration: none;
   transition: color $transition-fast;
-  
+
   &:hover {
     color: var(--color-primary);
   }
-  
+
   &-primary {
     @include button-primary;
     padding: $spacing-2 $spacing-4;
@@ -635,16 +747,29 @@ svg[aria-hidden="true"] {
 }
 
 .mobile-menu-button {
-  @include button-base;
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: transparent;
-  color: var(--text-primary);
-  @include flex-center;
-  
-  @media (min-width: $breakpoint-md) {
-    display: none;
+  display: none;
+
+  @media (max-width: $breakpoint-md) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
   }
 }
 
@@ -658,6 +783,7 @@ svg[aria-hidden="true"] {
 }
 
 .content-view {
+
   &.map-view,
   &.list-view {
     width: 100%;
@@ -681,7 +807,7 @@ svg[aria-hidden="true"] {
   display: grid;
   gap: $spacing-8;
   grid-template-columns: 1fr;
-  
+
   @media (min-width: $breakpoint-lg) {
     grid-template-columns: 2fr 1fr;
   }
@@ -699,7 +825,7 @@ svg[aria-hidden="true"] {
   height: 300px;
   object-fit: cover;
   display: block;
-  
+
   &-placeholder {
     @include flex-center;
     background: var(--bg-tertiary);
@@ -726,11 +852,11 @@ svg[aria-hidden="true"] {
   @include flex-center;
   gap: $spacing-2;
   margin-left: $spacing-4;
-  
+
   .btn {
     @include flex-center;
     gap: $spacing-1;
-    
+
     svg {
       width: 16px !important;
       height: 16px !important;
@@ -759,43 +885,43 @@ svg[aria-hidden="true"] {
   gap: $spacing-3;
   justify-content: flex-start;
   margin-bottom: $spacing-4;
-  
+
   .stars {
     @include flex-center;
     gap: $spacing-1;
-    
+
     .filled {
       color: var(--color-warning);
       width: 24px;
       height: 24px;
-      
+
       &.large {
         width: 28px;
         height: 28px;
       }
     }
-    
+
     .empty {
       color: var(--color-gray-300);
       width: 24px;
       height: 24px;
-      
+
       &.large {
         width: 28px;
         height: 28px;
       }
     }
-    
+
     .star-half {
       position: relative;
       width: 24px;
       height: 24px;
-      
+
       &.large {
         width: 28px;
         height: 28px;
       }
-      
+
       .filled {
         position: absolute;
         top: 0;
@@ -805,13 +931,13 @@ svg[aria-hidden="true"] {
       }
     }
   }
-  
+
   .rating-score {
     @include text-headline;
     color: var(--text-primary);
     font-weight: $font-weight-bold;
   }
-  
+
   .rating-text {
     @include text-callout;
     color: var(--text-secondary);
@@ -831,7 +957,7 @@ svg[aria-hidden="true"] {
   font-weight: $font-weight-semibold;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  
+
   &.status-info {
     background: rgba(0, 122, 255, 0.1);
     color: var(--color-primary);
@@ -857,14 +983,14 @@ svg[aria-hidden="true"] {
   @include flex-center;
   gap: $spacing-2;
   justify-content: flex-start;
-  
+
   svg {
     width: 20px !important;
     height: 20px !important;
     color: var(--text-tertiary);
     flex-shrink: 0;
   }
-  
+
   span {
     @include text-callout;
     color: var(--text-secondary);
@@ -895,7 +1021,7 @@ svg[aria-hidden="true"] {
   width: 100%;
   @include flex-center;
   gap: $spacing-2;
-  
+
   svg {
     width: 20px !important;
     height: 20px !important;
@@ -908,7 +1034,7 @@ svg[aria-hidden="true"] {
   background: var(--bg-tertiary);
   border-radius: $radius-md;
   border: 1px solid var(--border-secondary);
-  
+
   span {
     @include text-callout;
     color: var(--color-success);
@@ -975,7 +1101,7 @@ svg[aria-hidden="true"] {
   background: var(--bg-primary);
   box-shadow: var(--shadow-small);
   margin-bottom: $spacing-4;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -1026,13 +1152,13 @@ svg[aria-hidden="true"] {
   @include flex-center;
   gap: $spacing-1;
   flex-shrink: 0;
-  
+
   .filled {
     color: var(--color-warning);
     width: 16px;
     height: 16px;
   }
-  
+
   .empty {
     color: var(--color-gray-300);
     width: 16px;
@@ -1054,23 +1180,23 @@ svg[aria-hidden="true"] {
   padding: $spacing-6;
   text-align: center;
   justify-content: flex-start;
-  
+
   &__icon {
     font-size: $font-size-5xl;
     flex-shrink: 0;
   }
-  
+
   &__content {
     flex: 1;
     text-align: left;
   }
-  
+
   &__title {
     @include text-title-3;
     color: var(--text-primary);
     margin-bottom: $spacing-2;
   }
-  
+
   &__message {
     @include text-body;
     color: var(--text-secondary);
@@ -1084,38 +1210,38 @@ svg[aria-hidden="true"] {
     padding-top: $spacing-4;
     padding-bottom: $spacing-4;
   }
-  
+
   .detail-grid {
     gap: $spacing-4;
   }
-  
+
   .snack-header {
     padding: $spacing-4;
   }
-  
+
   .snack-name {
     @include text-title-1;
   }
-  
+
   .rating-display {
     flex-wrap: wrap;
     gap: $spacing-2;
   }
-  
+
   .snack-meta-info {
     gap: $spacing-2;
   }
-  
+
   .sidebar-card {
     padding: $spacing-4;
   }
-  
+
   .review-header {
     flex-direction: column;
     gap: $spacing-3;
     align-items: flex-start;
   }
-  
+
   .review-card {
     padding: $spacing-4;
   }
@@ -1145,7 +1271,7 @@ svg[aria-hidden="true"] {
   @include flex-center;
   gap: $spacing-6;
   justify-content: flex-start;
-  
+
   @media (max-width: $breakpoint-md) {
     flex-direction: column;
     text-align: center;
@@ -1160,7 +1286,7 @@ svg[aria-hidden="true"] {
   @include flex-center;
   flex-shrink: 0;
   box-shadow: var(--shadow-medium);
-  
+
   &-emoji {
     font-size: 3rem;
   }
@@ -1185,7 +1311,7 @@ svg[aria-hidden="true"] {
   @include text-headline;
   color: var(--color-primary);
   text-decoration: none;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -1202,7 +1328,7 @@ svg[aria-hidden="true"] {
   @include flex-center;
   gap: $spacing-8;
   justify-content: flex-start;
-  
+
   @media (max-width: $breakpoint-md) {
     justify-content: center;
   }
@@ -1210,14 +1336,14 @@ svg[aria-hidden="true"] {
 
 .profile-stat {
   text-align: center;
-  
+
   &-value {
     @include text-headline;
     color: var(--text-primary);
     font-weight: $font-weight-bold;
     display: block;
   }
-  
+
   &-label {
     @include text-caption-1;
     color: var(--text-tertiary);
@@ -1228,10 +1354,10 @@ svg[aria-hidden="true"] {
 
 .profile-actions {
   flex-shrink: 0;
-  
+
   @media (max-width: $breakpoint-md) {
     width: 100%;
-    
+
     .btn {
       width: 100%;
     }
@@ -1240,7 +1366,7 @@ svg[aria-hidden="true"] {
 
 .profile-section {
   margin-bottom: $spacing-8;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -1271,19 +1397,19 @@ svg[aria-hidden="true"] {
   background: var(--bg-primary);
   text-align: center;
   padding: $spacing-12 $spacing-6;
-  
+
   &-icon {
     font-size: $font-size-5xl;
     margin-bottom: $spacing-4;
     opacity: 0.5;
   }
-  
+
   &-title {
     @include text-title-3;
     color: var(--text-secondary);
     margin-bottom: $spacing-3;
   }
-  
+
   &-message {
     @include text-body;
     color: var(--text-tertiary);
@@ -1305,14 +1431,14 @@ svg[aria-hidden="true"] {
   background: var(--bg-primary);
   padding: $spacing-4;
   text-align: center;
-  
+
   .badge-name {
     @include text-callout;
     color: var(--text-primary);
     font-weight: $font-weight-semibold;
     margin-bottom: $spacing-2;
   }
-  
+
   .badge-description {
     @include text-caption-1;
     color: var(--text-secondary);
@@ -1325,14 +1451,14 @@ svg[aria-hidden="true"] {
   padding: $spacing-4;
   background: var(--bg-secondary);
   border-radius: $radius-md;
-  
+
   &__title {
     @include text-callout;
     color: var(--text-primary);
     margin-bottom: $spacing-3;
     font-weight: $font-weight-medium;
   }
-  
+
   &__list {
     display: flex;
     flex-wrap: wrap;
@@ -1370,32 +1496,272 @@ svg[aria-hidden="true"] {
   text-align: center;
   padding: $spacing-8;
   max-width: 400px;
-  
+
   .location-icon,
   .error-icon {
     font-size: $font-size-5xl;
     margin-bottom: $spacing-4;
   }
-  
+
   .location-text {
     @include text-body;
     color: var(--text-secondary);
     margin-top: $spacing-4;
   }
-  
+
   .error-title {
     @include text-title-3;
     color: var(--text-primary);
     margin-bottom: $spacing-3;
   }
-  
+
   .error-message {
     @include text-body;
     color: var(--text-secondary);
     margin-bottom: $spacing-6;
   }
-  
+
   .retry-button {
     @include button-primary;
+  }
+}
+
+/* Header Layout Improvements */
+.desktop-nav--spaced {
+  /* Styles moved to main header section above */
+}
+
+.user-menu--improved {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-section--spaced {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-info--with-emoji {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  padding: 0.375rem 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  .user-avatar {
+    font-size: 1.25rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 122, 255, 0.1);
+  }
+
+  .username {
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+
+  &:hover {
+    background: rgba(0, 122, 255, 0.05);
+
+    .user-avatar {
+      background: rgba(0, 122, 255, 0.15);
+    }
+  }
+}
+
+.logout-button--compact {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #E5E5E7;
+  background: white;
+  border-radius: 8px;
+  color: #1D1D1F;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #FF3B30;
+    color: #FF3B30;
+    background: rgba(255, 59, 48, 0.05);
+  }
+}
+
+.auth-buttons--spaced {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+
+  .auth-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+
+    &:hover {
+      background: rgba(0, 122, 255, 0.05);
+      color: #007AFF;
+    }
+  }
+
+  .auth-link--primary {
+    background: #007AFF;
+    color: white !important;
+    font-weight: 600;
+
+    &:hover {
+      background: #0056D3 !important;
+      color: white !important;
+    }
+  }
+}
+
+/* Filter Bar Compact Layout */
+.filter-bar--compact {
+  padding: 0.75rem 1rem;
+}
+
+.filter-content--tighter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  /* Reduced from default gap */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Search and Filter Box - grouped together */
+.search-filter-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #E5E5E7;
+  border-radius: 8px;
+  background: white;
+  overflow: hidden;
+  flex: 1;
+  max-width: 500px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: #007AFF;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  }
+}
+
+.search-form--boxed {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-input-container--boxed {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .search-icon {
+    position: absolute;
+    left: 0.75rem;
+    width: 1rem;
+    height: 1rem;
+    color: #8E8E93;
+    z-index: 1;
+  }
+}
+
+.search-input--boxed {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #8E8E93;
+  }
+}
+
+.filter-group--boxed {
+  border-left: 1px solid #E5E5E7;
+}
+
+.toggle-button--boxed {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: #1D1D1F;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    background: #F2F2F7;
+    color: #007AFF;
+  }
+
+  &.active {
+    background: #007AFF;
+    color: white;
+
+    &:hover {
+      background: #0056D3;
+    }
+  }
+}
+
+/* Existing compact styles for view toggle */
+.filter-group--compact,
+.view-toggle--compact {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .filter-content--tighter {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  .search-filter-box {
+    max-width: none;
+  }
+
+  .filter-group--compact,
+  .view-toggle--compact {
+    justify-content: center;
+  }
+
+  .filter-group--boxed {
+    border-left: none;
+    border-top: 1px solid #E5E5E7;
+  }
+
+  .search-filter-box {
+    flex-direction: column;
   }
 }
