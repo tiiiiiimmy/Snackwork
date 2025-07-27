@@ -1,20 +1,24 @@
+// Auth Components - Apple Style
+@use '../variables' as *;
+@use '../mixins' as *;
+
 // Auth page container
 .auth-container {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, $primary-color, $secondary-color);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
     padding: $spacing-12 $spacing-4;
 }
 
 // Auth form card
 .auth-card {
-    @include card;
+    @include card-base;
     max-width: 28rem;
     width: 100%;
     padding: $spacing-8;
-    animation: fade-in 0.6s ease-out;
+    @include fade-in;
 }
 
 // Auth header
@@ -22,43 +26,36 @@
     text-align: center;
     margin-bottom: $spacing-8;
 
-    .auth-icon {
-        font-size: 4rem;
-        margin-bottom: $spacing-4;
-        animation: bounce 2s infinite;
-    }
-
     .auth-title {
-        font-size: $font-size-3xl;
-        font-weight: 700;
-        color: $gray-900;
+        @include text-title-1;
+        color: var(--text-primary);
         margin-bottom: $spacing-2;
     }
 
     .auth-subtitle {
-        font-size: $font-size-lg;
-        color: $gray-600;
+        @include text-body;
+        color: var(--text-secondary);
     }
 
     .auth-link-text {
         margin-top: $spacing-4;
-        font-size: $font-size-base;
-        color: $gray-600;
+        @include text-body;
+        color: var(--text-secondary);
 
         .auth-link {
-            font-weight: 600;
-            color: $primary-color;
+            font-weight: $font-weight-semibold;
+            color: var(--color-primary);
             text-decoration: none;
-            transition: color 0.2s ease-in-out;
+            transition: color $transition-fast;
 
             &:hover {
-                color: #2563eb;
+                color: var(--color-primary-dark);
             }
         }
     }
 }
 
-// Form styles
+// Auth form
 .auth-form {
     .form-group {
         margin-bottom: $spacing-6;
@@ -69,65 +66,148 @@
     }
 
     .form-label {
-        display: block;
-        font-size: $font-size-sm;
-        font-weight: 600;
-        color: $gray-700;
+        @include text-callout;
+        color: var(--text-primary);
         margin-bottom: $spacing-2;
+        font-weight: $font-weight-medium;
     }
 
     .form-input {
         @include input-base;
+        width: 100%;
     }
 
-    .password-input-wrapper {
-        position: relative;
-
-        .password-toggle {
-            position: absolute;
-            right: $spacing-3;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: $gray-500;
-            cursor: pointer;
-            padding: $spacing-1;
-            transition: color 0.2s ease-in-out;
-
-            &:hover {
-                color: $primary-color;
-            }
-
-            svg {
-                width: 1.25rem;
-                height: 1.25rem;
-            }
-        }
+    .form-error {
+        @include text-caption-1;
+        color: var(--color-error);
+        margin-top: $spacing-1;
     }
 
-    .submit-button {
+    .form-help {
+        @include text-caption-1;
+        color: var(--text-tertiary);
+        margin-top: $spacing-1;
+    }
+
+    .submit-btn {
         @include button-primary;
         width: 100%;
-        padding: $spacing-4 $spacing-6;
-        font-size: $font-size-base;
         margin-top: $spacing-6;
+    }
 
-        .loading-spinner {
-            margin-right: $spacing-2;
+    .forgot-password-link {
+        display: inline-block;
+        margin-top: $spacing-4;
+        @include text-callout;
+        color: var(--color-primary);
+        text-decoration: none;
+        transition: color $transition-fast;
+
+        &:hover {
+            color: var(--color-primary-dark);
         }
     }
 }
 
-// Error message
+// Auth divider
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: $spacing-6 0;
+    
+    &::before,
+    &::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border-secondary);
+    }
+    
+    span {
+        padding: 0 $spacing-4;
+        @include text-caption-1;
+        color: var(--text-tertiary);
+    }
+}
+
+// Social auth buttons
+.social-auth {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-3;
+    
+    .social-btn {
+        @include button-secondary;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-3;
+        
+        .social-icon {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+// Loading state
+.auth-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    
+    .loading-spinner {
+        @include loading-shimmer;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+}
+
+// Error state
 .auth-error {
-    background: rgba($danger-color, 0.1);
-    border: 1px solid rgba($danger-color, 0.3);
-    color: $danger-color;
-    padding: $spacing-4 $spacing-6;
-    border-radius: $border-radius-lg;
-    font-size: $font-size-sm;
-    font-weight: 600;
+    @include card-base;
+    max-width: 28rem;
+    width: 100%;
+    padding: $spacing-6;
     text-align: center;
-    margin-bottom: $spacing-6;
+    background: var(--color-error-light);
+    border: 1px solid var(--color-error);
+    
+    .error-icon {
+        font-size: $font-size-3xl;
+        margin-bottom: $spacing-4;
+    }
+    
+    .error-title {
+        @include text-title-3;
+        color: var(--color-error);
+        margin-bottom: $spacing-2;
+    }
+    
+    .error-message {
+        @include text-body;
+        color: var(--text-secondary);
+    }
+}
+
+// Responsive design
+@media (max-width: $breakpoint-sm) {
+    .auth-container {
+        padding: $spacing-4;
+    }
+    
+    .auth-card {
+        padding: $spacing-6;
+    }
+    
+    .auth-header {
+        margin-bottom: $spacing-6;
+        
+        .auth-title {
+            @include text-title-2;
+        }
+    }
 }

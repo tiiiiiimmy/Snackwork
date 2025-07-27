@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { StarIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
+import { apiService } from '../../services/api';
 import type { Snack } from '../../types/api';
 
 interface SnackCardProps {
@@ -15,32 +16,49 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
     const ratingText = `${rating.toFixed(1)} out of 5 stars, based on ${snack.totalRatings} reviews`;
 
     return (
-      <div className="snack-rating" aria-label={ratingText}>
-        <div className="rating-stars" aria-hidden="true">
+      <div className="snack-card__rating" aria-label={ratingText}>
+        <div className="snack-card__rating-stars" aria-hidden="true">
           {[...Array(5)].map((_, index) => {
             if (index < fullStars) {
               return (
-                <StarIconSolid key={index} className="filled" />
+                <StarIconSolid key={index} className="star-icon star-icon--filled" />
               );
             } else if (index === fullStars && hasHalfStar) {
               return (
                 <div key={index} className="star-half-container">
-                  <StarIcon className="empty" />
-                  <StarIconSolid className="filled star-half" />
+                  <StarIcon className="star-icon star-icon--empty" />
+                  <StarIconSolid className="star-icon star-icon--filled star-half" />
                 </div>
               );
             } else {
               return (
-                <StarIcon key={index} className="empty" />
+                <StarIcon key={index} className="star-icon star-icon--empty" />
               );
             }
           })}
         </div>
-        <span className="rating-value" aria-hidden="true">
-          {rating.toFixed(1)} ({snack.totalRatings})
-        </span>
+        <div className="snack-card__rating-text">
+          <span className="snack-card__rating-value">
+            {rating.toFixed(1)}
+          </span>
+          <span className="snack-card__rating-count">
+            ({snack.totalRatings})
+          </span>
+        </div>
       </div>
     );
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+    return date.toLocaleDateString();
   };
 
   return (
@@ -50,57 +68,77 @@ export const SnackCard: React.FC<SnackCardProps> = ({ snack }) => {
       aria-label={`View details for ${snack.name} - ${snack.averageRating.toFixed(1)} stars`}
     >
       <div className="snack-card" data-testid="snack-card">
-        {/* Image */}
-        {snack.imageUrl ? (
-          <img
-            src={snack.imageUrl}
-            alt={`Photo of ${snack.name}`}
-            className="snack-image"
-            loading="lazy"
-          />
-        ) : (
-          <div className="snack-image-placeholder" aria-label="No image available">
-            <span aria-hidden="true">No image available</span>
+        {/* Image Container */}
+        <div className="snack-card__image-container">
+          {snack.hasImage ? (
+            <img
+              src={apiService.getImageUrl(snack.id)}
+              alt={`Photo of ${snack.name}`}
+              className="snack-card__image"
+              loading="lazy"
+            />
+          ) : (
+            <div className="snack-card__image-placeholder" aria-label="No image available">
+              🍪
+            </div>
+          )}
+          
+          {/* Category Badge */}
+          <div className="snack-card__badge">
+            {snack.category}
           </div>
-        )}
+        </div>
 
         {/* Content */}
-        <div className="snack-content">
-          <div className="snack-header">
-            <h3 className="snack-title">
-              {snack.name}
-            </h3>
-
-            {snack.shopName && (
-              <div className="snack-location">
-                <MapPinIcon aria-hidden="true" />
-                <span>{snack.shopName}</span>
-              </div>
-            )}
-          </div>
+        <div className="snack-card__content">
+          <h3 className="snack-card__title">
+            {snack.name}
+          </h3>
 
           {snack.description && (
-            <p className="snack-description">
+            <p className="snack-card__description">
               {snack.description}
             </p>
           )}
 
-          <div className="snack-meta">
+          {/* Meta Info */}
+          <div className="snack-card__meta">
+            <div className="snack-card__category">
+              {snack.category}
+            </div>
             {renderStars(snack.averageRating)}
-            {snack.shopName && (
-              <span className="snack-shop">
-                {snack.shopName}
-              </span>
-            )}
           </div>
 
-          {snack.category && (
-            <div className="snack-category">
-              <span className="category-badge" data-testid="category-badge">
-                {typeof snack.category === 'string' ? snack.category : snack.category.name}
+          {/* Store Info */}
+          <div className="snack-card__store">
+            <MapPinIcon className="snack-card__store-icon" aria-hidden="true" />
+            <div>
+              <div className="snack-card__store-name">
+                {snack.store.name}
+              </div>
+              {snack.store.address && (
+                <div className="snack-card__store-address">
+                  {snack.store.address}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="snack-card__footer">
+            <div className="snack-card__user">
+              <div className="snack-card__user-avatar">
+                {snack.user.username.charAt(0).toUpperCase()}
+              </div>
+              <span className="snack-card__user-name">
+                {snack.user.username}
               </span>
             </div>
-          )}
+            
+            <div className="snack-card__date">
+              {formatTimeAgo(snack.createdAt)}
+            </div>
+          </div>
         </div>
       </div>
     </Link>

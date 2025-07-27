@@ -45,18 +45,22 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
   };
 
   const getInitials = (username: string) => {
-    return username.charAt(0).toUpperCase();
+    return username?.charAt(0)?.toUpperCase() || '?';
   };
+
+  // Defensive check for user data
+  const username = review.user?.username || 'Anonymous User';
+  const userInitials = getInitials(username);
 
   return (
     <div className="review-card">
       <div className="review-header">
         <div className="review-author">
           <div className="author-avatar">
-            {getInitials(review.user.username)}
+            {userInitials}
           </div>
           <div className="author-info">
-            <div className="author-name">{review.user.username}</div>
+            <div className="author-name">{username}</div>
             <div className="review-date">{formatDate(review.createdAt)}</div>
           </div>
         </div>

@@ -5,13 +5,30 @@ export interface User {
   email: string;
   level: number;
   experiencePoints: number;
+  location?: Location;
+  instagramHandle?: string;
+  bio?: string;
+  avatarEmoji: string;
   createdAt: string;
+  statistics?: {
+    totalSnacks: number;
+    totalReviews: number;
+    averageRatingGiven: number;
+  };
+  badges?: Badge[];
 }
 
 export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
+}
+
+export interface UpdateProfileRequest {
+  username?: string;
+  instagramHandle?: string;
+  bio?: string;
+  avatarEmoji?: string;
 }
 
 export interface LoginRequest {
@@ -31,12 +48,45 @@ export interface Location {
   lng: number;
 }
 
+// Store types
+export interface Store {
+  id: string;
+  name: string;
+  address?: string;
+  latitude: number;
+  longitude: number;
+  createdAt: string;
+  snackCount?: number;
+}
+
+export interface CreateStoreRequest {
+  name: string;
+  address?: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface StoresResponse {
+  stores: Store[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 // Category types
 export interface Category {
   id: string;
   name: string;
   description?: string;
   createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+}
+
+export interface CreateCategoryRequest {
+  name: string;
+  description?: string;
 }
 
 // Snack types
@@ -44,12 +94,10 @@ export interface Snack {
   id: string;
   name: string;
   description?: string;
-  categoryId?: string;
-  category?: Category | string; // Category object or name from API
-  imageUrl?: string;
-  location: Location; // Coordinates object
-  shopName?: string; // Shop/store name
-  shopAddress?: string; // Shop address
+  categoryId: string;
+  category: string; // Category name from API
+  hasImage: boolean;
+  store: Store;
   averageRating: number;
   totalRatings: number;
   createdAt: string;
@@ -57,16 +105,19 @@ export interface Snack {
     id: string;
     username: string;
   };
+  reviews?: Review[];
 }
 
 export interface CreateSnackRequest {
   name: string;
   description?: string;
   categoryId: string;
-  imageUrl?: string;
-  location: Location;
-  shopName?: string;
-  shopAddress?: string;
+  storeId: string;
+}
+
+export interface UploadImageRequest {
+  snackId: string;
+  image: File;
 }
 
 // Review types

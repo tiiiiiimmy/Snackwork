@@ -5,7 +5,12 @@ import type {
   RegisterRequest,
   LoginRequest,
   AuthResponse,
+  UpdateProfileRequest,
+  Store,
+  CreateStoreRequest,
+  StoresResponse,
   Category,
+  CreateCategoryRequest,
   Snack,
   CreateSnackRequest,
   Review,
@@ -20,6 +25,12 @@ interface SnacksQueryParams {
   lng: number;
   radius: number;
   categoryId?: string;
+  search?: string;
+}
+
+interface StoresQueryParams {
+  page: number;
+  pageSize: number;
   search?: string;
 }
 
@@ -106,7 +117,12 @@ class ApiService {
   }
 
   async getCurrentUser(): Promise<User> {
-    const response = await this.api.get<User>('/auth/profile');
+    const response = await this.api.get<User>('/users/me');
+    return response.data;
+  }
+
+  async updateProfile(data: UpdateProfileRequest): Promise<User> {
+    const response = await this.api.put<User>('/users/me', data);
     return response.data;
   }
 
@@ -121,9 +137,33 @@ class ApiService {
     return response.data;
   }
 
-  async createCategory(category: Omit<Category, 'id' | 'createdAt'>): Promise<Category> {
+  async createCategory(category: CreateCategoryRequest): Promise<Category> {
     const response = await this.api.post<Category>('/categories', category);
     return response.data;
+  }
+
+  // Stores endpoints
+  async getStores(search?: string, page: number = 1, pageSize: number = 20): Promise<StoresResponse> {
+    const params: StoresQueryParams = { page, pageSize };
+    if (search && search.trim()) {
+      params.search = search.trim();
+    }
+    const response = await this.api.get<StoresResponse>('/stores', { params });
+    return response.data;
+  }
+
+  async getStore(id: string): Promise<Store> {
+    const response = await this.api.get<Store>(`/stores/${id}`);
+    return response.data;
+  }
+
+  async createStore(data: CreateStoreRequest): Promise<Store> {
+    const response = await this.api.post<Store>('/stores', data);
+    return response.data;
+  }
+
+  async deleteStore(id: string): Promise<void> {
+    await this.api.delete(`/stores/${id}`);
   }
 
   // Snacks endpoints
@@ -150,6 +190,30 @@ class ApiService {
   async createSnack(data: CreateSnackRequest): Promise<Snack> {
     const response = await this.api.post<Snack>('/snacks', data);
     return response.data;
+  }
+
+  async updateSnack(id: string, data: CreateSnackRequest): Promise<Snack> {
+    const response = await this.api.put<Snack>(`/snacks/${id}`, data);
+    return response.data;
+  }
+
+  async deleteSnack(id: string): Promise<void> {
+    await this.api.delete(`/snacks/${id}`);
+  }
+
+  // Images endpoints
+  async uploadImage(snackId: string, image: File): Promise<void> {
+    const formData = new FormData();
+    formData.append('image', image);
+    await this.api.post(`/snacks/${snackId}/image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
+  getImageUrl(snackId: string): string {
+    return `${this.api.defaults.baseURL}/images/${snackId}`;
   }
 
   // Reviews endpoints

@@ -29,12 +29,15 @@ export const SnackDetail: React.FC = () => {
     const fetchSnackData = async () => {
       try {
         setLoading(true);
-        const [snackData, reviewsData] = await Promise.all([
-          apiService.getSnack(id),
-          apiService.getSnackReviews(id),
-        ]);
+        const snackData = await apiService.getSnack(id);
         setSnack(snackData);
-        setReviews(reviewsData);
+        // Use reviews from snack data if available, otherwise fetch separately
+        if (snackData.reviews) {
+          setReviews(snackData.reviews);
+        } else {
+          const reviewsData = await apiService.getSnackReviews(id);
+          setReviews(reviewsData);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load snack details');
       } finally {
@@ -58,6 +61,25 @@ export const SnackDetail: React.FC = () => {
         console.error('Failed to refresh snack data:', err);
       }
     }
+  };
+
+  // Check if current user has already reviewed this snack
+  const hasUserReviewed = () => {
+    if (!user) {
+      console.log('No user logged in');
+      return false;
+    }
+    if (!reviews || reviews.length === 0) {
+      console.log('No reviews found');
+      return false;
+    }
+    
+    const userReview = reviews.find(review => review.user?.id === user.id);
+    console.log('User ID:', user.id);
+    console.log('Reviews:', reviews.map(r => ({ id: r.id, userId: r.user?.id, username: r.user?.username })));
+    console.log('Has user reviewed:', !!userReview);
+    
+    return !!userReview;
   };
 
   const renderStars = (rating: number, size: 'sm' | 'lg' = 'sm') => {
@@ -129,9 +151,9 @@ export const SnackDetail: React.FC = () => {
           {/* Main Info */}
           <div className="snack-info-card">
             {/* Image */}
-            {snack.imageUrl ? (
+            {snack.hasImage ? (
               <img
-                src={snack.imageUrl}
+                src={`/api/v1/snacks/${snack.id}/image`}
                 alt={snack.name}
                 className="snack-image"
               />
@@ -145,9 +167,9 @@ export const SnackDetail: React.FC = () => {
             <div className="snack-header">
               <div className="snack-header-top">
                 <h1 className="snack-name">{snack.name}</h1>
-                {snack.shopName && (
+                {snack.store && (
                   <span className="shop-name">
-                    {snack.shopName}
+                    {snack.store.name}
                   </span>
                 )}
               </div>
@@ -169,7 +191,7 @@ export const SnackDetail: React.FC = () => {
               {snack.category && (
                 <div className="category-section">
                   <span className="status-badge status-info">
-                    {typeof snack.category === 'string' ? snack.category : snack.category.name}
+                    {snack.category}
                   </span>
                 </div>
               )}
@@ -183,10 +205,10 @@ export const SnackDetail: React.FC = () => {
 
               {/* Location and Meta */}
               <div className="snack-meta-info">
-                {snack.shopName && (
+                {snack.store && (
                   <div className="snack-location">
                     <MapPinIcon />
-                    <span>{snack.shopName}</span>
+                    <span>{snack.store.name}</span>
                   </div>
                 )}
                 <div className="snack-location">
@@ -207,7 +229,7 @@ export const SnackDetail: React.FC = () => {
               <h2 className="sidebar-title">
                 Reviews ({reviews.length})
               </h2>
-              {user && (
+              {user && !hasUserReviewed() && (
                 <button
                   onClick={() => setShowAddReview(!showAddReview)}
                   className="submit-button add-review-button"
@@ -216,10 +238,15 @@ export const SnackDetail: React.FC = () => {
                   <span>Add Review</span>
                 </button>
               )}
+              {user && hasUserReviewed() && (
+                <div className="user-reviewed-message">
+                  <span>✓ You've already reviewed this snack</span>
+                </div>
+              )}
             </div>
 
             {/* Add Review Form */}
-            {showAddReview && user && snack && (
+            {showAddReview && user && snack && !hasUserReviewed() && (
               <div className="sidebar-card">
                 <AddReviewForm
                   snackId={snack.id}
@@ -247,7 +274,7 @@ export const SnackDetail: React.FC = () => {
                   <p className="no-reviews-text">
                     Be the first to share your thoughts about this snack!
                   </p>
-                  {user && (
+                  {user && !hasUserReviewed() && (
                     <button
                       onClick={() => setShowAddReview(true)}
                       className="submit-button"

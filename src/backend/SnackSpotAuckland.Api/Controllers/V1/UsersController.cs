@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using SnackSpotAuckland.Api.Data;
 using SnackSpotAuckland.Api.Models;
 
@@ -56,6 +58,9 @@ public class UsersController : ControllerBase
                 user.Level,
                 user.ExperiencePoints,
                 Location = user.Location != null ? new { lat = user.Location.Y, lng = user.Location.X } : null,
+                user.InstagramHandle,
+                user.Bio,
+                user.AvatarEmoji,
                 user.CreatedAt,
                 Statistics = new
                 {
@@ -80,19 +85,87 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <returns>Current user profile</returns>
     [HttpGet("me")]
+    [Authorize]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public ActionResult<object> GetCurrentUser()
+    public async Task<ActionResult<object>> GetCurrentUser()
     {
         try
         {
-            // TODO: Get user ID from JWT token
-            // For now, return a placeholder response
-            return Unauthorized(new { message = "Authentication required" });
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user" });
+            }
+
+            return await GetUser(userId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving current user");
+            return StatusCode(500, new { message = "Internal server error" });
+        }
+    }
+
+    [HttpPut("me")]
+    [Authorize]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<object>> UpdateProfile([FromBody] UpdateProfileRequest request)
+    {
+        try
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user" });
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            // Validate username uniqueness if changed
+            if (!string.IsNullOrEmpty(request.Username) && request.Username != user.Username)
+            {
+                var existingUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Username.ToLower() == request.Username.ToLower() && u.Id != userId);
+                if (existingUser != null)
+                {
+                    return BadRequest(new { message = "Username already taken" });
+                }
+                user.Username = request.Username;
+            }
+
+            // Update profile fields
+            if (request.InstagramHandle != null)
+                user.InstagramHandle = request.InstagramHandle.Trim();
+            
+            if (request.Bio != null)
+                user.Bio = request.Bio.Trim();
+            
+            if (!string.IsNullOrEmpty(request.AvatarEmoji))
+                user.AvatarEmoji = request.AvatarEmoji;
+
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                user.Id,
+                user.Username,
+                user.InstagramHandle,
+                user.Bio,
+                user.AvatarEmoji,
+                user.UpdatedAt
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating user profile");
             return StatusCode(500, new { message = "Internal server error" });
         }
     }
@@ -117,7 +190,8 @@ public class UsersController : ControllerBase
 
             var snacks = await _context.Snacks
                 .Include(s => s.Category)
-                .Where(s => s.UserId == id)
+                .Include(s => s.Store)
+                .Where(s => s.UserId == id && !s.IsDeleted)
                 .OrderByDescending(s => s.CreatedAt)
                 .Select(s => new
                 {
@@ -125,10 +199,8 @@ public class UsersController : ControllerBase
                     s.Name,
                     s.Description,
                     Category = s.Category.Name,
-                    s.ImageUrl,
-                    Location = new { lat = s.Location.Y, lng = s.Location.X },
-                    s.ShopName,
-                    s.ShopAddress,
+                    HasImage = s.Image != null,
+                    Store = new { s.Store.Id, s.Store.Name, s.Store.Address, s.Store.Latitude, s.Store.Longitude },
                     s.AverageRating,
                     s.TotalRatings,
                     s.CreatedAt
@@ -246,4 +318,12 @@ public class Badge
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Icon { get; set; } = string.Empty;
+}
+
+public class UpdateProfileRequest
+{
+    public string? Username { get; set; }
+    public string? InstagramHandle { get; set; }
+    public string? Bio { get; set; }
+    public string? AvatarEmoji { get; set; }
 }

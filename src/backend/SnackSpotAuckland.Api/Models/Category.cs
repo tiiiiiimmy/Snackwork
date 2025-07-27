@@ -18,6 +18,8 @@ public class Category
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    public bool IsDeleted { get; set; } = false;
+
     // Navigation properties
     public virtual ICollection<Snack> Snacks { get; set; } = new List<Snack>();
 }

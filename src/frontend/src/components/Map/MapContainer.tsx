@@ -104,7 +104,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       };
 
       const marker = new google.maps.Marker({
-        position: { lat: snack.location.lat, lng: snack.location.lng },
+        position: { lat: snack.store.latitude, lng: snack.store.longitude },
         map,
         title: snack.name,
         icon: svgMarker,
@@ -116,7 +116,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
           <div style="padding: 12px; max-width: 280px; font-family: Inter, sans-serif;">
             <h3 style="font-weight: 700; color: #111827; margin-bottom: 8px; font-size: 16px; line-height: 1.4; margin-top: 0;">${snack.name}</h3>
             ${snack.description ? `<p style="font-size: 14px; color: #4b5563; margin-bottom: 8px; line-height: 1.5; margin-top: 0;">${snack.description}</p>` : ''}
-            <p style="font-size: 14px; color: #6b7280; margin-bottom: 12px; margin-top: 0;">${snack.shopName || 'Location'}</p>
+            <p style="font-size: 14px; color: #6b7280; margin-bottom: 12px; margin-top: 0;">${snack.store.name || 'Location'}</p>
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 4px;">
                 <span style="color: #f59e0b;">⭐</span>

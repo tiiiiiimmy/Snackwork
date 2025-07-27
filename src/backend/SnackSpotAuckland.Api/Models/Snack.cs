@@ -26,21 +26,13 @@ public class Snack
     [Required]
     public Guid CategoryId { get; set; }
 
-    [StringLength(500)]
-    public string? ImageUrl { get; set; }
+    public byte[]? Image { get; set; }
 
     [Required]
     public Guid UserId { get; set; }
 
     [Required]
-    [Column(TypeName = "geometry (point, 4326)")]
-    public Point Location { get; set; } = null!;
-
-    [StringLength(200)]
-    public string? ShopName { get; set; }
-
-    [StringLength(500)]
-    public string? ShopAddress { get; set; }
+    public Guid StoreId { get; set; }
 
     [Range(0.0, 5.0)]
     [Column(TypeName = "decimal(3,2)")]
@@ -53,12 +45,17 @@ public class Snack
 
     public DataSource DataSource { get; set; } = DataSource.User;
 
+    public bool IsDeleted { get; set; } = false;
+
     // Navigation properties
     [ForeignKey(nameof(CategoryId))]
     public virtual Category Category { get; set; } = null!;
 
     [ForeignKey(nameof(UserId))]
     public virtual User User { get; set; } = null!;
+
+    [ForeignKey(nameof(StoreId))]
+    public virtual Store Store { get; set; } = null!;
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

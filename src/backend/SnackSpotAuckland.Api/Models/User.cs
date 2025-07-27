@@ -35,6 +35,15 @@ public class User
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    [StringLength(64)]
+    public string? InstagramHandle { get; set; }
+
+    [StringLength(200)]
+    public string? Bio { get; set; }
+
+    [StringLength(8)]
+    public string AvatarEmoji { get; set; } = "🍪";
+
     // Navigation properties
     public virtual ICollection<Snack> Snacks { get; set; } = new List<Snack>();
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();

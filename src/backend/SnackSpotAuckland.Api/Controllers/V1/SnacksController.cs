@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using SnackSpotAuckland.Api.Data;
 using SnackSpotAuckland.Api.Models;
-using NetTopologySuite.Geometries;
-using NetTopologySuite;
 
 namespace SnackSpotAuckland.Api.Controllers.V1;
 
@@ -16,7 +14,6 @@ public class SnacksController : ControllerBase
 {
     private readonly SnackSpotDbContext _context;
     private readonly ILogger<SnacksController> _logger;
-    private static readonly GeometryFactory _geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
     public SnacksController(SnackSpotDbContext context, ILogger<SnacksController> logger)
     {
@@ -24,15 +21,6 @@ public class SnacksController : ControllerBase
         _logger = logger;
     }
 
-    /// <summary>
-    /// Get snacks within a specified radius
-    /// </summary>
-    /// <param name="lat">Latitude</param>
-    /// <param name="lng">Longitude</param>
-    /// <param name="radius">Radius in meters (default: 1000)</param>
-    /// <param name="categoryId">Optional category ID to filter snacks</param>
-    /// <param name="search">Optional search term to filter by name or description</param>
-    /// <returns>List of snacks within the specified radius</returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -45,7 +33,6 @@ public class SnacksController : ControllerBase
     {
         try
         {
-            // Check if required parameters are provided by checking the raw query string
             var queryString = HttpContext.Request.QueryString.Value;
             if (string.IsNullOrEmpty(queryString) || !queryString.Contains("lat=") || !queryString.Contains("lng="))
             {
@@ -57,57 +44,37 @@ public class SnacksController : ControllerBase
                 return BadRequest(new { message = "Invalid latitude or longitude values" });
             }
 
-            if (radius <= 0 || radius > 50000) // Max 50km radius
+            if (radius <= 0 || radius > 50000)
             {
                 return BadRequest(new { message = "Radius must be between 1 and 50000 meters" });
             }
 
-            var searchPoint = _geometryFactory.CreatePoint(new Coordinate(lng, lat));
+            var query = _context.Snacks
+                .Include(s => s.Category)
+                .Include(s => s.User)
+                .Include(s => s.Store)
+                .Where(s => !s.IsDeleted)
+                .AsQueryable();
 
-            // Check if we're using an in-memory database (tests) or PostgreSQL (production)
-            var isInMemoryDb = _context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory";
+            // Filter by distance using store coordinates
+            var latRange = radius / 111000.0;
+            var lngRange = radius / (111000.0 * Math.Cos(lat * Math.PI / 180));
 
-            IQueryable<Snack> query;
+            query = query.Where(s => Math.Abs((double)s.Store.Latitude - lat) <= latRange &&
+                               Math.Abs((double)s.Store.Longitude - lng) <= lngRange);
 
-            if (isInMemoryDb)
-            {
-                // For in-memory database (tests), use simple filtering
-                // Note: This is less accurate but works for testing
-                var latRange = radius / 111000.0; // Rough conversion: 1 degree ≈ 111km
-                var lngRange = radius / (111000.0 * Math.Cos(lat * Math.PI / 180));
-
-                query = _context.Snacks
-                    .Include(s => s.Category)
-                    .Include(s => s.User)
-                    .Where(s => Math.Abs(s.Location.Y - lat) <= latRange &&
-                               Math.Abs(s.Location.X - lng) <= lngRange);
-            }
-            else
-            {
-                // For PostgreSQL with PostGIS, use proper geographic distance
-                query = _context.Snacks
-                    .FromSqlRaw(@"
-                        SELECT s.* FROM ""Snacks"" s
-                        WHERE ST_DWithin(s.""Location""::geography, ST_MakePoint({0}, {1})::geography, {2})
-                    ", lng, lat, radius)
-                    .Include(s => s.Category)
-                    .Include(s => s.User);
-            }
-
-            // Filter by category if categoryId is provided
             if (categoryId.HasValue)
             {
                 query = query.Where(s => s.CategoryId == categoryId.Value);
             }
 
-            // Filter by search term if provided
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var searchLower = search.ToLower();
                 query = query.Where(s =>
                     s.Name.ToLower().Contains(searchLower) ||
                     (s.Description != null && s.Description.ToLower().Contains(searchLower)) ||
-                    (s.ShopName != null && s.ShopName.ToLower().Contains(searchLower)));
+                    s.Store.Name.ToLower().Contains(searchLower));
             }
 
             var snacks = await query
@@ -118,10 +85,8 @@ public class SnacksController : ControllerBase
                     s.Description,
                     s.CategoryId,
                     Category = s.Category.Name,
-                    s.ImageUrl,
-                    Location = new { lat = s.Location.Y, lng = s.Location.X },
-                    s.ShopName,
-                    s.ShopAddress,
+                    HasImage = s.Image != null,
+                    Store = new { s.Store.Id, s.Store.Name, s.Store.Address, s.Store.Latitude, s.Store.Longitude },
                     s.AverageRating,
                     s.TotalRatings,
                     s.CreatedAt,
@@ -139,11 +104,6 @@ public class SnacksController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Get a specific snack by ID
-    /// </summary>
-    /// <param name="id">Snack ID</param>
-    /// <returns>Snack details</returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -154,11 +114,12 @@ public class SnacksController : ControllerBase
             var snack = await _context.Snacks
                 .Include(s => s.Category)
                 .Include(s => s.User)
+                .Include(s => s.Store)
                 .Include(s => s.Reviews.Where(r => !r.IsHidden))
                     .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
-            if (snack == null)
+            if (snack == null || snack.IsDeleted)
             {
                 return NotFound(new { message = "Snack not found" });
             }
@@ -169,10 +130,8 @@ public class SnacksController : ControllerBase
                 snack.Name,
                 snack.Description,
                 Category = snack.Category.Name,
-                snack.ImageUrl,
-                Location = new { lat = snack.Location.Y, lng = snack.Location.X },
-                snack.ShopName,
-                snack.ShopAddress,
+                HasImage = snack.Image != null,
+                Store = new { snack.Store.Id, snack.Store.Name, snack.Store.Address, snack.Store.Latitude, snack.Store.Longitude },
                 snack.AverageRating,
                 snack.TotalRatings,
                 snack.CreatedAt,
@@ -196,11 +155,6 @@ public class SnacksController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Create a new snack (requires authentication)
-    /// </summary>
-    /// <param name="snackDto">Snack data</param>
-    /// <returns>Created snack</returns>
     [HttpPost]
     [Authorize]
     [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
@@ -215,21 +169,23 @@ public class SnacksController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            // Get user ID from JWT token
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
             {
                 return Unauthorized(new { message = "Invalid user" });
             }
 
-            // Validate category exists
             var category = await _context.Categories.FindAsync(snackDto.CategoryId);
-            if (category == null)
+            if (category == null || category.IsDeleted)
             {
                 return BadRequest(new { message = "Invalid category ID" });
             }
 
-            var location = _geometryFactory.CreatePoint(new Coordinate(snackDto.Location.Lng, snackDto.Location.Lat));
+            var store = await _context.Stores.FindAsync(snackDto.StoreId);
+            if (store == null || store.IsDeleted)
+            {
+                return BadRequest(new { message = "Invalid store ID" });
+            }
 
             var snack = new Snack
             {
@@ -237,11 +193,8 @@ public class SnacksController : ControllerBase
                 Name = snackDto.Name,
                 Description = snackDto.Description,
                 CategoryId = snackDto.CategoryId,
-                ImageUrl = snackDto.ImageUrl,
                 UserId = userId,
-                Location = location,
-                ShopName = snackDto.ShopName,
-                ShopAddress = snackDto.ShopAddress,
+                StoreId = snackDto.StoreId,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -254,10 +207,7 @@ public class SnacksController : ControllerBase
                 snack.Name,
                 snack.Description,
                 Category = category.Name,
-                snack.ImageUrl,
-                Location = new { lat = snack.Location.Y, lng = snack.Location.X },
-                snack.ShopName,
-                snack.ShopAddress,
+                Store = new { store.Id, store.Name, store.Address, store.Latitude, store.Longitude },
                 snack.CreatedAt
             });
         }
@@ -268,12 +218,6 @@ public class SnacksController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Update a snack (only by owner)
-    /// </summary>
-    /// <param name="id">Snack ID</param>
-    /// <param name="snackDto">Updated snack data</param>
-    /// <returns>Updated snack</returns>
     [HttpPut("{id}")]
     [Authorize]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
@@ -290,7 +234,6 @@ public class SnacksController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            // Get user ID from JWT token
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
             {
@@ -300,37 +243,35 @@ public class SnacksController : ControllerBase
             var existingSnack = await _context.Snacks
                 .Include(s => s.Category)
                 .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .Include(s => s.Store)
+                .FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted);
 
             if (existingSnack == null)
             {
                 return NotFound(new { message = "Snack not found" });
             }
 
-            // Check if user owns this snack
             if (existingSnack.UserId != userId)
             {
                 return Forbid();
             }
 
-            // Validate category exists
             var category = await _context.Categories.FindAsync(snackDto.CategoryId);
-            if (category == null)
+            if (category == null || category.IsDeleted)
             {
                 return BadRequest(new { message = "Invalid category ID" });
             }
 
-            // Update snack properties
+            var store = await _context.Stores.FindAsync(snackDto.StoreId);
+            if (store == null || store.IsDeleted)
+            {
+                return BadRequest(new { message = "Invalid store ID" });
+            }
+
             existingSnack.Name = snackDto.Name;
             existingSnack.Description = snackDto.Description;
             existingSnack.CategoryId = snackDto.CategoryId;
-            existingSnack.ImageUrl = snackDto.ImageUrl;
-            existingSnack.ShopName = snackDto.ShopName;
-            existingSnack.ShopAddress = snackDto.ShopAddress;
-
-            // Update location if provided
-            var location = _geometryFactory.CreatePoint(new Coordinate(snackDto.Location.Lng, snackDto.Location.Lat));
-            existingSnack.Location = location;
+            existingSnack.StoreId = snackDto.StoreId;
 
             await _context.SaveChangesAsync();
 
@@ -341,10 +282,7 @@ public class SnacksController : ControllerBase
                 existingSnack.Description,
                 existingSnack.CategoryId,
                 Category = category.Name,
-                existingSnack.ImageUrl,
-                Location = new { lat = existingSnack.Location.Y, lng = existingSnack.Location.X },
-                existingSnack.ShopName,
-                existingSnack.ShopAddress,
+                Store = new { store.Id, store.Name, store.Address, store.Latitude, store.Longitude },
                 existingSnack.AverageRating,
                 existingSnack.TotalRatings,
                 existingSnack.CreatedAt,
@@ -358,11 +296,6 @@ public class SnacksController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Delete a snack (only by owner)
-    /// </summary>
-    /// <param name="id">Snack ID</param>
-    /// <returns>No content</returns>
     [HttpDelete("{id}")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -373,27 +306,43 @@ public class SnacksController : ControllerBase
     {
         try
         {
-            // Get user ID from JWT token
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
             {
                 return Unauthorized(new { message = "Invalid user" });
             }
 
-            var existingSnack = await _context.Snacks.FirstOrDefaultAsync(s => s.Id == id);
+            var existingSnack = await _context.Snacks
+                .Include(s => s.Category)
+                .FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted);
 
             if (existingSnack == null)
             {
                 return NotFound(new { message = "Snack not found" });
             }
 
-            // Check if user owns this snack
             if (existingSnack.UserId != userId)
             {
                 return Forbid();
             }
 
-            _context.Snacks.Remove(existingSnack);
+            // Soft delete the snack
+            existingSnack.IsDeleted = true;
+
+            // Check if category has any other active snacks
+            var categoryHasOtherSnacks = await _context.Snacks
+                .AnyAsync(s => s.CategoryId == existingSnack.CategoryId && s.Id != id && !s.IsDeleted);
+
+            // If category has no other snacks, soft delete it
+            if (!categoryHasOtherSnacks)
+            {
+                var category = await _context.Categories.FindAsync(existingSnack.CategoryId);
+                if (category != null)
+                {
+                    category.IsDeleted = true;
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -411,14 +360,5 @@ public class CreateSnackDto
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public Guid CategoryId { get; set; }
-    public string? ImageUrl { get; set; }
-    public LocationDto Location { get; set; } = new();
-    public string? ShopName { get; set; }
-    public string? ShopAddress { get; set; }
-}
-
-public class LocationDto
-{
-    public double Lat { get; set; }
-    public double Lng { get; set; }
+    public Guid StoreId { get; set; }
 }

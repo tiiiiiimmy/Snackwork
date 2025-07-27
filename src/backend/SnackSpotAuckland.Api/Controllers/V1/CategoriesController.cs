@@ -32,6 +32,7 @@ public class CategoriesController : ControllerBase
         try
         {
             var categories = await _context.Categories
+                .Where(c => !c.IsDeleted)
                 .OrderBy(c => c.Name)
                 .ToListAsync();
 
@@ -56,7 +57,9 @@ public class CategoriesController : ControllerBase
     {
         try
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories
+                .Where(c => c.Id == id && !c.IsDeleted)
+                .FirstOrDefaultAsync();
 
             if (category == null)
             {
@@ -92,20 +95,19 @@ public class CategoriesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            // Check user level >= 2 (CON-001 requirement)
-            var levelString = User.FindFirst("level")?.Value;
-            if (string.IsNullOrEmpty(levelString) || !int.TryParse(levelString, out var userLevel) || userLevel < 2)
-            {
-                return Forbid("Only users Level 2+ can create new categories");
-            }
+            // Normalize category name
+            var normalizedName = category.Name.Trim().ToLower();
+            category.Name = string.Join(" ", category.Name.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
 
-            // Check if category name already exists
+            // Check if category name already exists (case insensitive)
             var existingCategory = await _context.Categories
-                .FirstOrDefaultAsync(c => c.Name.ToLower() == category.Name.ToLower());
+                .Where(c => !c.IsDeleted)
+                .FirstOrDefaultAsync(c => c.Name.ToLower() == normalizedName);
 
             if (existingCategory != null)
             {
-                return BadRequest(new { message = "Category with this name already exists" });
+                // Return existing category (idempotent)
+                return Ok(existingCategory);
             }
 
             category.Id = Guid.NewGuid();
